@@ -66,7 +66,7 @@ export function streamTutorResponse(params: StreamTutorParams) {
     model: anthropic(modelId),
     system: contextBlock ? `${systemPrompt}\n\n${contextBlock}` : systemPrompt,
     messages,
-    maxTokens: 1024,
+    maxOutputTokens: 1024,
     tools: {
       /** Return an AWS documentation reference for a concept. */
       get_aws_docs: tool({
