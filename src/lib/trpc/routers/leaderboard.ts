@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { router, protectedProcedure } from "../router";
+import { router, protectedProcedure } from "../init";
 import { LEADERBOARD } from "@/lib/constants";
 
 function currentWeekStart(): string {
