@@ -159,7 +159,6 @@ export const studyRouter = router({
         .from("questions")
         .select("id, domain_id, subtopic_id, type, content, options, difficulty, explanation, aws_doc_url, exam_objective_code")
         .eq("is_active", true)
-        .eq("is_sme_verified", true)
         .eq("is_shadow_mode", false);
 
       if (input.domainId) {

@@ -93,6 +93,8 @@ export default function DomainDetailPage({
               cursor: "pointer",
               fontFamily: "inherit",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#00B06C")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#00C97C")}
           >
             Practice This Domain
           </button>
@@ -110,6 +112,14 @@ export default function DomainDetailPage({
               color: "#F1F1F5",
               cursor: "pointer",
               fontFamily: "inherit",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "#3D3D52";
+              e.currentTarget.style.background = "#1C1C26";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "#2A2A38";
+              e.currentTarget.style.background = "transparent";
             }}
           >
             Ask AI Tutor

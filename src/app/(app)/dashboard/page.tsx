@@ -179,7 +179,11 @@ export default function DashboardPage() {
               {weakDomainName}
             </p>
             <Link href={data.weakestDomainId ? `/practice/quiz?domainId=${data.weakestDomainId}` : "/practice/quiz"}>
-              <button style={ctaButtonStyle}>
+              <button
+                style={ctaButtonStyle}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#00B06C")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "#00C97C")}
+              >
                 Start Session →
               </button>
             </Link>

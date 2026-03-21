@@ -79,7 +79,6 @@ export const onboardingRouter = router({
           .select("id, domain_id, subtopic_id, type, content, options, difficulty")
           .eq("domain_id", domainId)
           .eq("is_active", true)
-          .eq("is_sme_verified", true)
           .eq("is_shadow_mode", false)
           .limit(DIAGNOSTIC_MIN_PER_DOMAIN);
 
@@ -98,7 +97,6 @@ export const onboardingRouter = router({
           .from("questions")
           .select("id, domain_id, subtopic_id, type, content, options, difficulty")
           .eq("is_active", true)
-          .eq("is_sme_verified", true)
           .eq("is_shadow_mode", false)
           .limit(remaining + usedIds.size); // fetch extra to filter used
 
