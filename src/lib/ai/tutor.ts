@@ -1,4 +1,4 @@
-import { streamText, tool } from "ai";
+import { streamText, tool, stepCountIs } from "ai";
 import { z } from "zod";
 import { anthropic } from "./index";
 import { AI_MODELS, AI_MESSAGE_LIMITS, AI_COST } from "@/lib/constants";
@@ -122,7 +122,7 @@ export function streamTutorResponse(params: StreamTutorParams) {
         }),
       }),
     },
-    maxSteps: 3, // Allow tool use within a single message
+    stopWhen: stepCountIs(3), // Allow tool use within a single message
     temperature: mode === "socratic" ? 0.7 : 0.3,
   });
 }

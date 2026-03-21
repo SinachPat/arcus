@@ -1,5 +1,4 @@
-import { generateText, tool } from "ai";
-import { generateObject } from "ai";
+import { generateText, generateObject, tool, stepCountIs } from "ai";
 import { z } from "zod";
 import { anthropic } from "./index";
 import { AI_MODELS } from "@/lib/constants";
@@ -39,7 +38,7 @@ export async function generateStudyPlan(params: GenerateStudyPlanParams): Promis
 Target date: ${targetExamDate ?? "not set — assume 8 weeks"}.
 Daily study goal: ${dailyGoalMinutes} minutes.
 Use the tools to fetch their performance data, then output the complete study plan as JSON.`,
-    maxSteps: 10,
+    stopWhen: stepCountIs(10),
     tools: {
       /** Fetch user's current domain mastery percentages. */
       get_domain_mastery: tool({
