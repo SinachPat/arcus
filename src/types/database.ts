@@ -4,6 +4,15 @@
 
 export type AuthProvider = "email" | "google" | "github";
 export type SubscriptionTier = "free" | "pro" | "premium";
+export type SubscriptionStatus =
+  | "trialing"
+  | "active"
+  | "incomplete"
+  | "incomplete_expired"
+  | "past_due"
+  | "canceled"
+  | "unpaid"
+  | "paused";
 export type TutorMode = "socratic" | "direct";
 export type SessionType = "practice" | "mock_exam" | "ai_tutor" | "diagnostic";
 export type QuestionType = "single_choice" | "multi_select";
