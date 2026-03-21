@@ -114,8 +114,8 @@ export default function StudyPage() {
                         <div style={{ width: "100%", height: 6, background: "#2A2A38", borderRadius: 3, overflow: "hidden", marginBottom: 6 }}>
                           <div style={{ width: `${domain.mastery}%`, height: "100%", borderRadius: 3, background: colors.text, transition: "width 0.5s ease" }} />
                         </div>
-                        <p style={{ fontSize: 12, color: "#52526B", margin: 0 }}>
-                          {domain.questionsAnswered} questions answered · Last practiced {formatDate(domain.lastPracticed)}
+                        <p className="domain-stats" style={{ fontSize: 12, color: "#52526B", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {domain.questionsAnswered}q answered · {formatDate(domain.lastPracticed)}
                         </p>
                       </div>
 
@@ -202,10 +202,11 @@ export default function StudyPage() {
       )}
       <style>{`
         @media (max-width: 640px) {
-          .study-domain-card { padding: 16px !important; gap: 12px !important; }
-          .study-domain-card .domain-number { width: 36px !important; height: 36px !important; }
+          .study-domain-card { padding: 14px !important; gap: 10px !important; }
+          .study-domain-card .domain-number { width: 36px !important; height: 36px !important; flex-shrink: 0 !important; }
           .study-domain-card .domain-number span { font-size: 14px !important; }
-          .study-domain-card .domain-mastery { font-size: 16px !important; }
+          .study-domain-card .domain-mastery { font-size: 15px !important; }
+          .study-domain-card .domain-stats { font-size: 11px !important; }
           .study-skill-tree { display: none !important; }
         }
       `}</style>

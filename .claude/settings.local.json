@@ -107,7 +107,22 @@
       "Bash(GIT_AUTHOR_NAME=\"Claude\" GIT_AUTHOR_EMAIL=\"noreply@anthropic.com\" git commit -m \"feat: build Layer 4 — study loop\")",
       "Bash(kill -9 92915)",
       "Bash(find /Users/USER/Desktop/arcus -name *.config.ts -o -name next.config.*)",
-      "Bash(grep -r updateSession /Users/USER/Desktop/arcus/src --include=*.ts --include=*.tsx)"
+      "Bash(grep -r updateSession /Users/USER/Desktop/arcus/src --include=*.ts --include=*.tsx)",
+      "Bash(npx supabase:*)",
+      "Bash(source /Users/USER/Desktop/arcus/.env.local)",
+      "Bash(curl -s -H \"apikey: $SUPABASE_SERVICE_ROLE_KEY\" -H \"Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY\" \"$NEXT_PUBLIC_SUPABASE_URL/rest/v1/exams?select=id,name&limit=5\")",
+      "Bash(supabase db:*)",
+      "Bash(supabase projects:*)",
+      "Bash(curl -s -X POST \"$NEXT_PUBLIC_SUPABASE_URL/rest/v1/rpc/\" -H \"apikey: $SUPABASE_SERVICE_ROLE_KEY\" -H \"Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY\" -H \"Content-Type: application/json\")",
+      "Bash(psql \"postgresql://postgres.dmxaallhflqzjmlfpqot:$SUPABASE_DB_PASSWORD@aws-0-us-west-1.pooler.supabase.com:5432/postgres\" -c \"SELECT current_database\\(\\);\")",
+      "Bash(brew list:*)",
+      "Bash(node scripts/run-migrations.mjs)",
+      "Bash(npm list:*)",
+      "Bash(supabase status:*)",
+      "Bash(supabase login:*)",
+      "Bash(curl -s -X POST \"https://dmxaallhflqzjmlfpqot.supabase.co/rest/v1/rpc/exec_sql\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRteGFhbGxoZmxxemptbGZwcW90Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDAzMjg5NiwiZXhwIjoyMDg5NjA4ODk2fQ.xR5YPhgsGrNaAPpK6Q23Wj_s43RevwgP3orgAe6sHPI\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRteGFhbGxoZmxxemptbGZwcW90Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDAzMjg5NiwiZXhwIjoyMDg5NjA4ODk2fQ.xR5YPhgsGrNaAPpK6Q23Wj_s43RevwgP3orgAe6sHPI\" -H \"Content-Type: application/json\")",
+      "Bash(curl -s \"https://dmxaallhflqzjmlfpqot.supabase.co/rest/v1/exams?select=id,name,code&is_active=eq.true\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRteGFhbGxoZmxxemptbGZwcW90Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDAzMjg5NiwiZXhwIjoyMDg5NjA4ODk2fQ.xR5YPhgsGrNaAPpK6Q23Wj_s43RevwgP3orgAe6sHPI\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRteGFhbGxoZmxxemptbGZwcW90Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDAzMjg5NiwiZXhwIjoyMDg5NjA4ODk2fQ.xR5YPhgsGrNaAPpK6Q23Wj_s43RevwgP3orgAe6sHPI\")",
+      "Bash(/opt/homebrew/Cellar/libpq/18.3/bin/psql \"postgresql://postgres.dmxaallhflqzjmlfpqot:Vfdm237shd@%235050@aws-0-us-east-1.pooler.supabase.com:6543/postgres\" -c \"SELECT 1 as test\")"
     ]
   }
 }

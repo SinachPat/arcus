@@ -306,6 +306,7 @@ export default function DashboardPage() {
           .dashboard-grid { grid-template-columns: 1fr !important; }
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .streak-text { font-size: 16px !important; }
+          .stat-value { font-size: 15px !important; }
         }
       `}</style>
     </div>
@@ -335,8 +336,9 @@ function StatCard({
     >
       <div style={{ marginBottom: 6 }}>{icon}</div>
       <p
+        className="stat-value"
         style={{
-          fontSize: 20,
+          fontSize: 18,
           fontFamily: "var(--font-geist-mono)",
           fontWeight: 700,
           color: "#F1F1F5",

@@ -113,12 +113,33 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+    /* Suppress browser default outlines globally — we handle focus-visible below */
+    outline: none;
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
   }
   html {
     @apply font-sans;
+  }
+
+  /* Keyboard-only focus ring — green, never shows on mouse/touch */
+  :focus-visible {
+    outline: 2px solid #00C97C;
+    outline-offset: 2px;
+  }
+
+  /* Kill browser link coloring — all link colors are explicit in this app */
+  a {
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent button focus rings on mouse/touch click */
+  button:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
   }
 }

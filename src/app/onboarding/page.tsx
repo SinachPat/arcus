@@ -109,7 +109,9 @@ export default function OnboardingPage() {
           flexDirection: "column",
           alignItems: "center",
           padding: "0 24px",
-          overflow: "hidden",
+          overflowY: "auto",
+          /* Extra bottom space so content isn't hidden behind the viewport edge */
+          paddingBottom: 40,
         }}
       >
         <div style={{ width: "100%", maxWidth: 560 }}>

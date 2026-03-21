@@ -347,7 +347,7 @@ function QuizContent() {
         />
       </div>
 
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 0" }}>
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "20px 0" }}>
         {/* Question counter */}
         <p style={{ fontSize: 12, color: "#52526B", textAlign: "right", marginBottom: 16 }}>
           Question {currentIdx + 1} of {totalQuestions}
@@ -539,7 +539,7 @@ function QuizContent() {
                 <div style={{ fontSize: 14, color: "#8B8BA7", lineHeight: 1.6 }}>
                   <ReactMarkdown>{feedback.explanation}</ReactMarkdown>
                 </div>
-                <div className="quiz-explanation-links" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, flexWrap: "wrap", gap: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, flexWrap: "wrap", gap: 8 }}>
                   {feedback.awsDocUrl && (
                     <a href={feedback.awsDocUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#00C97C", textDecoration: "none" }}>
                       AWS Documentation →
@@ -569,7 +569,7 @@ function QuizContent() {
         </AnimatePresence>
 
         {/* Control row */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20, gap: 8, flexWrap: "wrap" }}>
           <div style={{ display: "flex", gap: 8 }}>
             {!feedback && (
               <>
