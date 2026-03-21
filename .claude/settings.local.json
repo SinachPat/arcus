@@ -42,7 +42,8 @@
       "Bash(echo \"EXIT:$PIPESTATUS[0]\")",
       "Bash(grep -rn \"AI_MODELS\\\\|XP\\\\.\\\\|LEVEL_TIERS\\\\|DAILY_QUESTION\\\\|AI_MESSAGE_LIMITS\" src --include=*.ts)",
       "Bash(node -e \":*)",
-      "Bash(ls src/app/\\\\\\(auth\\\\\\)/login/ src/app/\\\\\\(auth\\\\\\)/signup/ src/app/\\\\\\(app\\\\\\)/dashboard/ src/app/\\\\\\(app\\\\\\)/settings/)"
+      "Bash(ls src/app/\\\\\\(auth\\\\\\)/login/ src/app/\\\\\\(auth\\\\\\)/signup/ src/app/\\\\\\(app\\\\\\)/dashboard/ src/app/\\\\\\(app\\\\\\)/settings/)",
+      "Bash(cat /Users/USER/Desktop/arcus/node_modules/next/dist/docs/01-app/02-guides/upgrading/*.md)"
     ]
   }
 }
