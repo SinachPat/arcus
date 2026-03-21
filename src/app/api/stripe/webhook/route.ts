@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
-import type { Database, SubscriptionStatus } from "@/types/database";
+import type { SubscriptionStatus } from "@/types/database";
 
-// Use service-role client so webhook can write without user session
+// Use service-role client so webhook can write without user session.
+// No Database generic here — the webhook upserts into Stripe-managed tables
+// (customers, subscriptions) that live outside the tRPC type surface.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createServiceClient() {
-  return createClient<Database>(
+  return createClient<any>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
