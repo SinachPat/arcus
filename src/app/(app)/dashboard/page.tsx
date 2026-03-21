@@ -113,7 +113,7 @@ export default function DashboardPage() {
                   size={streakSize}
                   style={{ color: streakColor, opacity: streakOpacity, filter: streakGlow, flexShrink: 0 }}
                 />
-                <span style={{ fontSize: 20, fontWeight: 700, color: "#F1F1F5" }}>
+                <span className="streak-text" style={{ fontSize: 20, fontWeight: 700, color: "#F1F1F5" }}>
                   {streak > 0 ? `${streak} day streak` : "Start your streak today"}
                 </span>
               </div>
@@ -305,6 +305,7 @@ export default function DashboardPage() {
         @media (max-width: 768px) {
           .dashboard-grid { grid-template-columns: 1fr !important; }
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .streak-text { font-size: 16px !important; }
         }
       `}</style>
     </div>

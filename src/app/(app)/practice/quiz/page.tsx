@@ -539,7 +539,7 @@ function QuizContent() {
                 <div style={{ fontSize: 14, color: "#8B8BA7", lineHeight: 1.6 }}>
                   <ReactMarkdown>{feedback.explanation}</ReactMarkdown>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
+                <div className="quiz-explanation-links" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, flexWrap: "wrap", gap: 8 }}>
                   {feedback.awsDocUrl && (
                     <a href={feedback.awsDocUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#00C97C", textDecoration: "none" }}>
                       AWS Documentation →

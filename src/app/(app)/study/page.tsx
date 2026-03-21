@@ -71,6 +71,7 @@ export default function StudyPage() {
                     style={{ textDecoration: "none" }}
                   >
                     <div
+                      className="study-domain-card"
                       style={{
                         background: "#13131A",
                         border: "1px solid #2A2A38",
@@ -87,6 +88,7 @@ export default function StudyPage() {
                     >
                       {/* Number square */}
                       <div
+                        className="domain-number"
                         style={{
                           width: 48,
                           height: 48,
@@ -119,7 +121,7 @@ export default function StudyPage() {
 
                       {/* Right: mastery % + practice link */}
                       <div style={{ textAlign: "right", flexShrink: 0 }}>
-                        <p style={{ fontSize: 20, fontFamily: "var(--font-geist-mono)", fontWeight: 700, color: colors.text, margin: 0 }}>
+                        <p className="domain-mastery" style={{ fontSize: 20, fontFamily: "var(--font-geist-mono)", fontWeight: 700, color: colors.text, margin: 0 }}>
                           {domain.mastery}%
                         </p>
                         <span style={{ fontSize: 13, color: "#00C97C" }}>Practice →</span>
@@ -133,7 +135,7 @@ export default function StudyPage() {
 
           {/* Skill Tree Visualization */}
           {domains && domains.length > 0 && (
-            <div style={{ marginTop: 32 }}>
+            <div className="study-skill-tree" style={{ marginTop: 32 }}>
               <h2 style={{ fontSize: 16, fontWeight: 600, color: "#F1F1F5", marginBottom: 16 }}>
                 Skill Tree
               </h2>
@@ -198,6 +200,15 @@ export default function StudyPage() {
           )}
         </>
       )}
+      <style>{`
+        @media (max-width: 640px) {
+          .study-domain-card { padding: 16px !important; gap: 12px !important; }
+          .study-domain-card .domain-number { width: 36px !important; height: 36px !important; }
+          .study-domain-card .domain-number span { font-size: 14px !important; }
+          .study-domain-card .domain-mastery { font-size: 16px !important; }
+          .study-skill-tree { display: none !important; }
+        }
+      `}</style>
     </div>
   );
 }

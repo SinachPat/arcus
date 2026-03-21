@@ -59,6 +59,7 @@ export default function PracticePage() {
         {cards.map((card) => (
           <Link key={card.title} href={card.href} style={{ textDecoration: "none" }}>
             <div
+              className="practice-card"
               style={{
                 background: "#13131A",
                 border: "1px solid #2A2A38",
@@ -73,7 +74,7 @@ export default function PracticePage() {
               onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#3D3D52")}
               onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#2A2A38")}
             >
-              <div style={{ flexShrink: 0 }}>{card.icon}</div>
+              <div className="practice-card-icon" style={{ flexShrink: 0 }}>{card.icon}</div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: 16, fontWeight: 600, color: "#F1F1F5", margin: 0 }}>
@@ -100,6 +101,7 @@ export default function PracticePage() {
               </div>
 
               <button
+                className="practice-start-btn"
                 style={{
                   height: 40,
                   border: "1px solid #00C97C",
@@ -131,6 +133,22 @@ export default function PracticePage() {
           </Link>
         ))}
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .practice-card {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
+            padding: 20px !important;
+          }
+          .practice-card-icon { display: none !important; }
+          .practice-start-btn {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

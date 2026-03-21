@@ -78,7 +78,7 @@ export default function DomainDetailPage({
       </p>
 
       {/* CTA Row */}
-      <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
+      <div className="domain-cta-row" style={{ display: "flex", gap: 12, marginTop: 20 }}>
         <Link href={`/practice/quiz?domainId=${domainId}`} style={{ flex: 1, textDecoration: "none" }}>
           <button
             style={{
@@ -187,6 +187,11 @@ export default function DomainDetailPage({
           </div>
         </div>
       )}
+      <style>{`
+        @media (max-width: 640px) {
+          .domain-cta-row { flex-direction: column !important; }
+        }
+      `}</style>
     </div>
   );
 }
