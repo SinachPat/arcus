@@ -256,6 +256,23 @@ export interface DbFlashcard {
   created_at: string;
 }
 
+export interface DbCustomer {
+  user_id: string;
+  stripe_customer_id: string;
+}
+
+export interface DbSubscription {
+  id: string;
+  user_id: string;
+  status: SubscriptionStatus;
+  price_id: string | null;
+  product_id: string | null;
+  quantity: number;
+  cancel_at_period_end: boolean;
+  trial_start: string | null;
+  trial_end: string | null;
+}
+
 // ---- Supabase Database generic type ----
 
 export interface Database {
@@ -345,6 +362,16 @@ export interface Database {
         Row: DbFlashcard;
         Insert: Omit<DbFlashcard, "id" | "created_at"> & { id?: string; created_at?: string };
         Update: Partial<Omit<DbFlashcard, "id" | "user_id">>;
+      };
+      customers: {
+        Row: DbCustomer;
+        Insert: DbCustomer;
+        Update: Partial<DbCustomer>;
+      };
+      subscriptions: {
+        Row: DbSubscription;
+        Insert: DbSubscription;
+        Update: Partial<DbSubscription>;
       };
     };
     Views: Record<string, never>;
