@@ -71,7 +71,7 @@ export function streamTutorResponse(params: StreamTutorParams) {
       /** Return an AWS documentation reference for a concept. */
       get_aws_docs: tool({
         description: "Look up the official AWS documentation URL for a specific service or concept",
-        parameters: z.object({
+        inputSchema: z.object({
           service: z.string().describe("AWS service name, e.g. 'S3', 'RDS Multi-AZ', 'CloudFront'"),
         }),
         execute: async ({ service }) => ({
@@ -83,7 +83,7 @@ export function streamTutorResponse(params: StreamTutorParams) {
       /** Retrieve a Socratic hint for the current question without revealing the answer. */
       get_hint: tool({
         description: "Generate a Socratic hint that guides without revealing the answer",
-        parameters: z.object({
+        inputSchema: z.object({
           hintLevel: z.number().int().min(1).max(3).describe("1=subtle, 2=medium, 3=strong"),
         }),
         execute: async ({ hintLevel }) => {
@@ -99,7 +99,7 @@ export function streamTutorResponse(params: StreamTutorParams) {
       /** Check whether the user's reasoning is on the right track. */
       check_understanding: tool({
         description: "Assess if the user's stated reasoning is correct and provide targeted feedback",
-        parameters: z.object({
+        inputSchema: z.object({
           userReasoning: z.string().describe("The reasoning the student provided"),
           isOnTrack:     z.boolean().describe("Whether their reasoning leads to the correct answer"),
         }),
@@ -113,7 +113,7 @@ export function streamTutorResponse(params: StreamTutorParams) {
       /** Surface a related practice question topic for reinforcement. */
       suggest_practice: tool({
         description: "Suggest a related topic or subtopic for further practice",
-        parameters: z.object({
+        inputSchema: z.object({
           concept: z.string().describe("The specific AWS concept to reinforce"),
         }),
         execute: async ({ concept }) => ({

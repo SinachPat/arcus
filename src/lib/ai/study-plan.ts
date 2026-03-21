@@ -43,7 +43,7 @@ Use the tools to fetch their performance data, then output the complete study pl
       /** Fetch user's current domain mastery percentages. */
       get_domain_mastery: tool({
         description: "Fetch the user's current mastery percentage for each exam domain",
-        parameters: z.object({}),
+        inputSchema: z.object({}),
         execute: async () => {
           const { data } = await supabase
             .from("user_domain_progress")
@@ -56,7 +56,7 @@ Use the tools to fetch their performance data, then output the complete study pl
       /** Fetch recently answered questions to identify weak subtopics. */
       get_weak_subtopics: tool({
         description: "Identify subtopics where the user is struggling (low mastery or high error rate)",
-        parameters: z.object({
+        inputSchema: z.object({
           limit: z.number().int().min(1).max(20).default(10),
         }),
         execute: async ({ limit }) => {
@@ -74,7 +74,7 @@ Use the tools to fetch their performance data, then output the complete study pl
       /** Fetch domain metadata (names, weights) for the target exam. */
       get_exam_domains: tool({
         description: "Fetch domain names and exam weight percentages for the target exam",
-        parameters: z.object({}),
+        inputSchema: z.object({}),
         execute: async () => {
           const { data } = await supabase
             .from("domains")
@@ -88,7 +88,7 @@ Use the tools to fetch their performance data, then output the complete study pl
       /** Fetch recent study session stats (accuracy, time spent). */
       get_recent_performance: tool({
         description: "Fetch accuracy and study time from the last 14 days of sessions",
-        parameters: z.object({}),
+        inputSchema: z.object({}),
         execute: async () => {
           const since = new Date();
           since.setDate(since.getDate() - 14);
