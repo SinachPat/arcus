@@ -5,116 +5,110 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
+  /* Core */
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-popover:            var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-primary:            var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:          var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-accent:             var(--accent);
+  --color-accent-foreground:  var(--accent-foreground);
+  --color-destructive:        var(--destructive);
+  --color-border:             var(--border);
+  --color-border-active:      var(--border-active);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
+
+  /* Semantic */
+  --color-success:            var(--success);
+  --color-warning:            var(--warning);
+
+  /* Surface layers */
+  --color-surface:            var(--surface);
+  --color-surface-elevated:   var(--surface-elevated);
+
+  /* Fonts */
+  --font-sans:  var(--font-geist-sans);
+  --font-mono:  var(--font-geist-mono);
+
+  /* Radius */
+  --radius-sm:  var(--radius-badge);    /* 4px — badges */
+  --radius-md:  var(--radius-button);   /* 6px — buttons, inputs */
+  --radius-lg:  var(--radius-card);     /* 8px — cards (Shadcn default) */
+  --radius-xl:  calc(var(--radius-card) * 1.5);
+
+  /* Shadow */
+  --shadow-card: var(--shadow);
+
+  /* Sidebar (kept for Shadcn sidebar component compat) */
+  --color-sidebar:                    var(--surface);
+  --color-sidebar-foreground:         var(--foreground);
+  --color-sidebar-primary:            var(--primary);
+  --color-sidebar-primary-foreground: var(--primary-foreground);
+  --color-sidebar-accent:             var(--surface-elevated);
+  --color-sidebar-accent-foreground:  var(--foreground);
+  --color-sidebar-border:             var(--border);
+  --color-sidebar-ring:               var(--ring);
 }
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
+:root,
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Backgrounds */
+  --background:        #0A0A0F;
+  --surface:           #13131A;
+  --surface-elevated:  #1C1C26;
+
+  /* Cards & popovers */
+  --card:              #13131A;
+  --card-foreground:   #F1F1F5;
+  --popover:           #1C1C26;
+  --popover-foreground: #F1F1F5;
+
+  /* Foreground */
+  --foreground:        #F1F1F5;
+
+  /* Primary — green CTA */
+  --primary:           #00C97C;
+  --primary-foreground: #0A0A0F;
+
+  /* Secondary — surface elevated */
+  --secondary:         #1C1C26;
+  --secondary-foreground: #F1F1F5;
+
+  /* Muted */
+  --muted:             #13131A;
+  --muted-foreground:  #8B8BA7;
+
+  /* Accent — cyan */
+  --accent:            #22D3EE;
+  --accent-foreground: #0A0A0F;
+
+  /* Semantic */
+  --destructive:       #EF4444;
+  --success:           #4ADE80;
+  --warning:           #F59E0B;
+
+  /* Borders */
+  --border:            #2A2A38;
+  --border-active:     #3D3D52;
+  --input:             #2A2A38;
+  --ring:              #00C97C;
+
+  /* Radius — --radius is Shadcn's base var; custom vars for semantic use */
+  --radius:            0.5rem;    /* 8px — Shadcn base, used by components.json */
+  --radius-card:       0.5rem;    /* 8px */
+  --radius-button:     0.375rem;  /* 6px */
+  --radius-badge:      0.25rem;   /* 4px */
+
+  /* Shadow */
+  --shadow:            0 0 0 1px #2A2A38, 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 @layer base {

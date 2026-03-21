@@ -1,0 +1,54 @@
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { router, protectedProcedure } from "../router";
+import { LEADERBOARD } from "@/lib/constants";
+
+function currentWeekStart(): string {
+  const now  = new Date();
+  const day  = now.getUTCDay(); // 0=Sun, 1=Mon
+  const diff = (day + 6) % 7;   // days since last Monday
+  const monday = new Date(now);
+  monday.setUTCDate(now.getUTCDate() - diff);
+  monday.setUTCHours(0, 0, 0, 0);
+  return monday.toISOString().split("T")[0]; // YYYY-MM-DD
+}
+
+export const leaderboardRouter = router({
+  /** Weekly XP leaderboard — all users, optionally filtered by exam. */
+  getWeekly: protectedProcedure
+    .input(
+      z.object({
+        examId:   z.string().uuid().optional(),
+        page:     z.number().int().min(1).default(1),
+        pageSize: z.number().int().min(1).max(100).default(LEADERBOARD.PAGE_SIZE),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const weekStart = currentWeekStart();
+      const offset    = (input.page - 1) * input.pageSize;
+
+      let query = ctx.supabase
+        .from("weekly_xp_snapshots")
+        .select("user_id, xp_earned, users(name, avatar_url), user_profiles(level)")
+        .eq("week_start", weekStart)
+        .order("xp_earned", { ascending: false })
+        .range(offset, offset + input.pageSize - 1);
+
+      if (input.examId) {
+        query = query.eq("exam_id", input.examId);
+      }
+
+      const { data, error } = await query;
+      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
+
+      return (data ?? []).map((row, index) => ({
+        userId:       row.user_id,
+        name:         (row.users as { name: string } | null)?.name ?? "Anonymous",
+        avatarUrl:    (row.users as { avatar_url: string | null } | null)?.avatar_url ?? null,
+        level:        (row.user_profiles as { level: number } | null)?.level ?? 1,
+        xpEarned:     row.xp_earned,
+        rank:         offset + index + 1,
+        isCurrentUser: row.user_id === ctx.user.id,
+      }));
+    }),
+});
