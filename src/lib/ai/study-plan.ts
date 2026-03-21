@@ -3,8 +3,8 @@ import { z } from "zod";
 import { anthropic } from "./index";
 import { AI_MODELS } from "@/lib/constants";
 import type { GeneratedStudyPlan } from "@/types";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@/types/database";
 
 const STUDY_PLAN_SYSTEM = `You are an expert AWS certification coach building a personalized study plan.
 Use the available tools to gather user performance data, identify knowledge gaps, and understand scheduling constraints.
@@ -20,7 +20,8 @@ interface GenerateStudyPlanParams {
   examId:           string;
   targetExamDate:   string | null; // ISO date
   dailyGoalMinutes: number;
-  supabase:         SupabaseClient<Database>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>;
 }
 
 /**
@@ -181,7 +182,8 @@ function buildDefaultPlan(targetExamDate: string | null, dailyGoalMinutes: numbe
 /** Use generateObject to produce a validated structured plan as an alternative path. */
 export async function generateStudyPlanStructured(
   prompt: string,
-  supabase: SupabaseClient<Database>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>,
   userId: string,
   examId: string,
 ): Promise<GeneratedStudyPlan> {
