@@ -974,9 +974,14 @@ function Footer() {
           {/* Product */}
           <div>
             <p style={{ fontSize: 12, fontWeight: 600, color: C.muted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 16 }}>Product</p>
-            {["Features", "Pricing", "How it works", "Study Plans"].map((l) => (
+            {([
+              ["Features",     "#features"],
+              ["Pricing",      "#pricing"],
+              ["How it works", "#how"],
+              ["Study Plans",  "/onboarding"],
+            ] as [string, string][]).map(([l, href]) => (
               <p key={l} style={{ marginBottom: 10 }}>
-                <a href="#" style={{ fontSize: 13, color: C.dim, textDecoration: "none", transition: "color 0.15s" }}
+                <a href={href} style={{ fontSize: 13, color: C.dim, textDecoration: "none", transition: "color 0.15s" }}
                   onMouseEnter={e => (e.currentTarget.style.color = C.muted)}
                   onMouseLeave={e => (e.currentTarget.style.color = C.dim)}
                 >{l}</a>
