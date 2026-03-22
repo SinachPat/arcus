@@ -1,4 +1,4 @@
-import { streamText, tool } from "ai";
+import { streamText, tool, convertToModelMessages } from "ai";
 import { z } from "zod";
 import { anthropic } from "@/lib/ai";
 import { createClient } from "@/lib/supabase/server";
@@ -75,7 +75,11 @@ export async function POST(request: Request) {
 
   // Parse request
   const body = await request.json();
-  const messages: Array<{ role: string; content: string | unknown[] }> = body.messages ?? [];
+  // DefaultChatTransport sends UIMessage[] — convertToModelMessages converts them
+  // to the CoreMessage format that streamText / Anthropic expect.
+  const uiMessages: unknown[] = body.messages ?? [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const messages = convertToModelMessages(uiMessages as any);
   const mode: "socratic" | "direct" = body.mode ?? "socratic";
   const context: TutorContext | null = body.context ?? null;
 
