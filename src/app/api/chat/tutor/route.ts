@@ -1,4 +1,4 @@
-import { streamText, tool, convertToModelMessages } from "ai";
+import { streamText, tool } from "ai";
 import { z } from "zod";
 import { anthropic } from "@/lib/ai";
 import { createClient } from "@/lib/supabase/server";
@@ -75,11 +75,21 @@ export async function POST(request: Request) {
 
   // Parse request
   const body = await request.json();
-  // DefaultChatTransport sends UIMessage[] — convertToModelMessages converts them
-  // to the CoreMessage format that streamText / Anthropic expect.
-  const uiMessages: unknown[] = body.messages ?? [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const messages = convertToModelMessages(uiMessages as any);
+  // DefaultChatTransport sends UIMessage[] with a `parts` array.
+  // convertToModelMessages() does not work on deserialized JSON (it returns {}).
+  // We manually extract text parts to build the CoreMessage array that streamText expects.
+  type RawPart = { type: string; text?: string };
+  type RawMsg = { role: string; parts?: RawPart[]; content?: string };
+  const rawMessages: RawMsg[] = body.messages ?? [];
+  const messages = rawMessages
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.parts
+        ? m.parts.filter((p) => p.type === "text").map((p) => p.text ?? "").join("")
+        : (m.content ?? ""),
+    }))
+    .filter((m) => m.content.length > 0);
   const mode: "socratic" | "direct" = body.mode ?? "socratic";
   const context: TutorContext | null = body.context ?? null;
 

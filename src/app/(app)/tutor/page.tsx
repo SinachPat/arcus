@@ -7,7 +7,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import {
   Bot, Send, RotateCcw, BookOpen, Zap, X, Sparkles, Lightbulb,
-  Plus, Clock, MessageSquare,
+  Plus, Clock, MessageSquare, PanelLeftClose, PanelLeftOpen, History,
 } from "lucide-react";
 import { useSessionStore } from "@/store/session";
 import { useAuthStore } from "@/store/auth";
@@ -185,27 +185,27 @@ function ToolResultCard({ toolName, result }: { toolName: string; result: unknow
 function HistorySidebar({
   history,
   activeId,
+  collapsed,
+  mobileOpen,
+  onToggle,
+  onMobileClose,
   onSelect,
   onNew,
   onDelete,
 }: {
   history: SavedConversation[];
   activeId: string | null;
+  collapsed: boolean;
+  mobileOpen: boolean;
+  onToggle: () => void;
+  onMobileClose: () => void;
   onSelect: (conv: SavedConversation) => void;
   onNew: () => void;
   onDelete: (id: string) => void;
 }) {
-  return (
-    <div style={{
-      width: 200,
-      flexShrink: 0,
-      display: "flex",
-      flexDirection: "column",
-      gap: 4,
-      borderRight: "1px solid #2A2A38",
-      paddingRight: 16,
-      marginRight: 16,
-    }}>
+  // Shared inner content (used by both desktop sidebar and mobile drawer)
+  const innerContent = (
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, height: "100%" }}>
       <button
         onClick={onNew}
         style={{
@@ -213,7 +213,7 @@ function HistorySidebar({
           background: "#13131A", border: "1px solid #2A2A38",
           borderRadius: 7, padding: "8px 12px", cursor: "pointer",
           color: "#F1F1F5", fontSize: 13, fontFamily: "inherit",
-          marginBottom: 8, transition: "border-color 0.15s",
+          flexShrink: 0, transition: "border-color 0.15s",
         }}
         onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#3D3D52")}
         onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#2A2A38")}
@@ -222,7 +222,7 @@ function HistorySidebar({
         New chat
       </button>
 
-      <p style={{ fontSize: 11, color: "#52526B", margin: "0 0 4px", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+      <p style={{ fontSize: 11, color: "#52526B", margin: "4px 0 2px", letterSpacing: "0.06em", textTransform: "uppercase", flexShrink: 0 }}>
         History
       </p>
 
@@ -236,15 +236,14 @@ function HistorySidebar({
           <div
             key={conv.id}
             style={{
-              position: "relative",
-              borderRadius: 6,
+              position: "relative", borderRadius: 6,
               background: conv.id === activeId ? "rgba(0,201,124,0.08)" : "transparent",
               border: `1px solid ${conv.id === activeId ? "rgba(0,201,124,0.2)" : "transparent"}`,
             }}
             className="history-item"
           >
             <button
-              onClick={() => onSelect(conv)}
+              onClick={() => { onSelect(conv); onMobileClose(); }}
               style={{
                 width: "100%", background: "none", border: "none",
                 cursor: "pointer", textAlign: "left", padding: "7px 28px 7px 8px",
@@ -279,6 +278,74 @@ function HistorySidebar({
       </div>
     </div>
   );
+
+  return (
+    <>
+      {/* ── Desktop sidebar (hidden on mobile via CSS) ─────────────────── */}
+      <div className="tutor-sidebar-desktop" style={{
+        width: collapsed ? 36 : 200,
+        flexShrink: 0,
+        display: "flex",
+        flexDirection: "column",
+        gap: collapsed ? 8 : 4,
+        borderRight: "1px solid #2A2A38",
+        paddingRight: collapsed ? 0 : 16,
+        marginRight: collapsed ? 12 : 16,
+        transition: "width 0.2s ease, padding-right 0.2s ease",
+        overflow: "hidden",
+      }}>
+        {/* Toggle button */}
+        <button
+          onClick={onToggle}
+          title={collapsed ? "Expand history" : "Collapse history"}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center",
+            width: 30, height: 30, borderRadius: 6, flexShrink: 0,
+            background: "transparent", border: "1px solid #2A2A38",
+            cursor: "pointer", color: "#52526B", transition: "border-color 0.15s, color 0.15s",
+            alignSelf: collapsed ? "center" : "flex-start",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#3D3D52"; e.currentTarget.style.color = "#F1F1F5"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#2A2A38"; e.currentTarget.style.color = "#52526B"; }}
+        >
+          {collapsed ? <PanelLeftOpen size={14} /> : <PanelLeftClose size={14} />}
+        </button>
+
+        {!collapsed && innerContent}
+      </div>
+
+      {/* ── Mobile drawer overlay (hidden on desktop via CSS) ──────────── */}
+      {mobileOpen && (
+        <div className="tutor-sidebar-mobile-overlay" onClick={onMobileClose} style={{
+          position: "fixed", inset: 0, zIndex: 50,
+          background: "rgba(0,0,0,0.5)",
+        }}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "absolute", top: 0, left: 0, bottom: 0,
+              width: 260, background: "#0D0D14",
+              borderRight: "1px solid #2A2A38",
+              padding: "16px 16px 24px",
+              display: "flex", flexDirection: "column", gap: 0,
+            }}
+          >
+            {/* Mobile drawer header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#F1F1F5", margin: 0 }}>Chat History</p>
+              <button
+                onClick={onMobileClose}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#52526B", padding: 4, display: "flex" }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+            {innerContent}
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
 // ── Main content ────────────────────────────────────────────────────────────
@@ -297,6 +364,8 @@ function TutorContent() {
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
   const [history, setHistory] = useState<SavedConversation[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileHistoryOpen, setMobileHistoryOpen] = useState(false);
 
   const tier = profile?.subscription_tier ?? "free";
   const dailyLimit = AI_MESSAGE_LIMITS[tier as keyof typeof AI_MESSAGE_LIMITS] ?? AI_MESSAGE_LIMITS.free;
@@ -499,6 +568,22 @@ function TutorContent() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {/* Mobile-only: open history drawer */}
+          <button
+            onClick={() => setMobileHistoryOpen(true)}
+            title="Chat history"
+            className="tutor-history-mobile-btn"
+            style={{
+              background: "none", border: "1px solid #2A2A38", borderRadius: 6,
+              padding: "5px 8px", cursor: "pointer", color: "#8B8BA7",
+              display: "none", alignItems: "center", gap: 5, fontSize: 12, fontFamily: "inherit",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#3D3D52")}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#2A2A38")}
+          >
+            <History size={13} />
+          </button>
+
           <button
             onClick={handleReset}
             title="Clear conversation"
@@ -544,6 +629,10 @@ function TutorContent() {
         <HistorySidebar
           history={history}
           activeId={activeConvId}
+          collapsed={sidebarCollapsed}
+          mobileOpen={mobileHistoryOpen}
+          onToggle={() => setSidebarCollapsed((c) => !c)}
+          onMobileClose={() => setMobileHistoryOpen(false)}
           onSelect={handleSelectConv}
           onNew={handleNew}
           onDelete={handleDeleteConv}
@@ -723,7 +812,15 @@ function TutorContent() {
         .tutor-message pre code { background: none; border: none; padding: 0; }
         .tutor-input-wrap:focus-within { border-color: #3D3D52 !important; }
         .history-item:hover .history-delete { opacity: 1 !important; }
-        @media (max-width: 640px) {
+        /* Desktop: sidebar visible, mobile btn hidden */
+        .tutor-sidebar-desktop { display: flex !important; }
+        .tutor-history-mobile-btn { display: none !important; }
+        @media (max-width: 768px) {
+          /* Hide desktop sidebar column on mobile — use drawer instead */
+          .tutor-sidebar-desktop { display: none !important; }
+          /* Show mobile history button in header */
+          .tutor-history-mobile-btn { display: flex !important; }
+          /* Slightly smaller font in textarea to avoid iOS zoom */
           .tutor-input-wrap textarea { font-size: 16px !important; }
         }
       `}</style>
