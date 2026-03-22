@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Sidebar from "./Sidebar";
 import BottomNav from "./BottomNav";
+import Breadcrumb from "./Breadcrumb";
 import { GamificationRenderer } from "@/components/gamification/GamificationRenderer";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -21,6 +22,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         className={collapsed ? "md:ml-[72px]" : "md:ml-60"}
       >
         <div className="px-4 py-4 md:px-5 md:py-4 pb-24 md:pb-4">
+          <Breadcrumb />
           {children}
         </div>
       </main>
