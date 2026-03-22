@@ -150,12 +150,8 @@ export default function Sidebar({
           paddingLeft: collapsed ? 0 : 0,
         }}
       >
-        {/* Logo */}
-        {collapsed ? (
-          /* Collapsed: show just the green icon mark cropped */
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src="/logo.png" alt="Arcus" style={{ height: 24, width: "auto", objectFit: "contain", objectPosition: "left" }} />
-        ) : (
+        {/* Logo — hidden when collapsed */}
+        {!collapsed && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src="/logo.png" alt="Arcus" style={{ height: 28, width: "auto" }} />
         )}
