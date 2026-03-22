@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
           .maybeSingle();
 
         if (!(profile as { onboarding_completed?: boolean } | null)?.onboarding_completed) {
-          return NextResponse.redirect(`${origin}/onboarding`);
+          // ?verified=1 tells the onboarding page to show an email-confirmed toast
+          return NextResponse.redirect(`${origin}/onboarding?verified=1`);
         }
       }
 

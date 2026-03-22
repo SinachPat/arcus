@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import ProgressBar from "@/components/onboarding/ProgressBar";
 import ExamSelection from "@/components/onboarding/ExamSelection";
@@ -42,6 +44,26 @@ export interface WizardState {
   } | null;
 }
 
+// ── Isolated component so only this tiny piece needs Suspense ────────────────
+function VerifiedToast() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (searchParams.get("verified") === "1") {
+      toast.success("Email verified!", {
+        description: "Your account is all set. Let's get you started.",
+        duration: 4000,
+      });
+      // Strip the param so a back-navigation doesn't re-fire the toast
+      router.replace("/onboarding", { scroll: false });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return null;
+}
+
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [wizard, setWizard] = useState<WizardState>({
@@ -69,6 +91,11 @@ export default function OnboardingPage() {
         fontFamily: "var(--font-geist-sans)",
       }}
     >
+      {/* Email-verified toast — renders nothing visually, fires once */}
+      <Suspense fallback={null}>
+        <VerifiedToast />
+      </Suspense>
+
       {/* ── Top bar ── */}
       <div
         style={{
