@@ -109,18 +109,28 @@ export const onboardingRouter = router({
         }
       }
 
-      // Shuffle for variety
-      const shuffled = allQuestions.sort(() => Math.random() - 0.5);
+      // Fisher-Yates shuffle — unbiased, O(n)
+      function shuffle<T>(arr: T[]): T[] {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
 
-      return shuffled.map((q) => ({
+      // Shuffle question order, then shuffle options within each question
+      // so the correct answer is never predictably at the same position.
+      return shuffle(allQuestions).map((q) => ({
         id:         q.id as string,
         domainId:   q.domain_id as string,
         subtopicId: q.subtopic_id as string | null,
         type:       q.type as string,
         content:    q.content as string,
         difficulty: q.difficulty as number,
-        options:    (q.options as Array<{ id: string; text: string; is_correct: boolean }>).map(
-          (opt) => ({ id: opt.id, text: opt.text, isCorrect: opt.is_correct })
+        options:    shuffle(
+          (q.options as Array<{ id: string; text: string; is_correct: boolean }>).map(
+            (opt) => ({ id: opt.id, text: opt.text, isCorrect: opt.is_correct })
+          )
         ),
       }));
     }),

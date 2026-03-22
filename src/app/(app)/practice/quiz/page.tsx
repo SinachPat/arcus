@@ -51,6 +51,29 @@ interface SessionStats {
   streakDay: number;
 }
 
+// ── Duolingo-style correct-answer cheer messages ──────────────────────────
+const CHEER_MESSAGES = [
+  "Nailed it! 🎯",
+  "You're on fire! 🔥",
+  "Crushed it! 💪",
+  "AWS wizard! 🧙",
+  "That's the one! ⚡",
+  "Brilliant! Keep rolling! 🚀",
+  "Cloud master in the making! ☁️",
+  "Boom! Correct! 💥",
+  "You got this! Keep it up! 🌟",
+  "Sharp thinking! 🧠",
+  "Excellent! One step closer! 🏆",
+  "Perfect! You're killing it! 🎉",
+  "That's what I'm talking about! 😎",
+  "Unstoppable! 🌊",
+  "Legendary answer! ✨",
+];
+
+function pickCheer(): string {
+  return CHEER_MESSAGES[Math.floor(Math.random() * CHEER_MESSAGES.length)];
+}
+
 function QuizContent({ onKeepStudying }: { onKeepStudying: () => void }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -69,6 +92,8 @@ function QuizContent({ onKeepStudying }: { onKeepStudying: () => void }) {
   const [showHint, setShowHint] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
+  // Picked once per question at confirm-time so it doesn't re-randomise on re-renders
+  const cheerRef = useRef<string>("");
 
   // Session-level stats
   const statsRef = useRef<SessionStats>({
@@ -137,6 +162,8 @@ function QuizContent({ onKeepStudying }: { onKeepStudying: () => void }) {
       });
 
       const answerResult = result as AnswerResult;
+      // Pick cheer once at confirm-time (ref = no re-render)
+      if (answerResult.isCorrect) cheerRef.current = pickCheer();
       setFeedback(answerResult);
 
       // Update session stats
@@ -172,6 +199,7 @@ function QuizContent({ onKeepStudying }: { onKeepStudying: () => void }) {
       setHintUsed(false);
       setShowHint(false);
       setQuestionStartTime(Date.now());
+      cheerRef.current = "";
     }
   }, [currentIdx, totalQuestions, sessionId, completeSession]);
 
@@ -418,11 +446,11 @@ function QuizContent({ onKeepStudying }: { onKeepStudying: () => void }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Feedback label */}
+            {/* Feedback label — cheer message for correct, plain for incorrect */}
             {feedback && (
               <p style={{ fontSize: 13, color: feedback.isCorrect ? "#4ADE80" : "#EF4444", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
                 {feedback.isCorrect ? <Check size={16} /> : <X size={16} />}
-                {feedback.isCorrect ? "Correct!" : "Incorrect"}
+                {feedback.isCorrect ? cheerRef.current : "Incorrect — check the explanation below"}
               </p>
             )}
 

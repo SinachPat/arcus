@@ -184,10 +184,18 @@ export const studyRouter = router({
         .sort((a, b) => a._score - b._score)
         .slice(0, input.count);
 
-      // Shuffle for variety
-      const shuffled = scored.sort(() => Math.random() - 0.5);
+      // Fisher-Yates shuffle — unbiased, O(n)
+      function shuffle<T>(arr: T[]): T[] {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
 
-      return shuffled.map((q) => ({
+      // Shuffle question order AND options within each question so the
+      // correct answer is never predictably at the same position.
+      return shuffle(scored).map((q) => ({
         id: q.id,
         domainId: q.domain_id,
         subtopicId: q.subtopic_id,
@@ -198,9 +206,10 @@ export const studyRouter = router({
         awsDocUrl: q.aws_doc_url ?? "",
         examObjectiveCode: q.exam_objective_code ?? "",
         // Strip is_correct — practice mode grades server-side
-        options: (
-          q.options as Array<{ id: string; text: string; is_correct: boolean; explanation?: string }>
-        ).map(({ id, text }) => ({ id, text })),
+        options: shuffle(
+          (q.options as Array<{ id: string; text: string; is_correct: boolean; explanation?: string }>)
+            .map(({ id, text }) => ({ id, text }))
+        ),
       }));
     }),
 

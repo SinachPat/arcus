@@ -42,8 +42,9 @@ export default function DashboardPage() {
   });
 
   const firstName = useMemo(() => {
-    const name = user?.user_metadata?.name as string | undefined;
-    return name?.split(" ")[0] ?? "there";
+    // signup stores full_name; OAuth providers may use name
+    const name = (user?.user_metadata?.full_name ?? user?.user_metadata?.name) as string | undefined;
+    return name?.split(" ")[0] ?? user?.email?.split("@")[0] ?? "there";
   }, [user]);
 
   if (isLoading || !data) {
