@@ -102,12 +102,16 @@ export default function SignupPage() {
     setError(null);
 
     const supabase = createClient();
+    // Use the canonical production URL so email verification links
+    // never point at localhost when signing up from a dev machine.
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || window.location.origin;
+
     const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${siteUrl}/auth/callback`,
       },
     });
 
