@@ -260,7 +260,7 @@ export default function DashboardPage() {
                 View all →
               </Link>
             </div>
-            {!leaderboard || leaderboard.length === 0 ? (
+            {!leaderboard || leaderboard.topList.length === 0 ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div key={i} style={{ height: 32, background: "#1C1C26", borderRadius: 4 }} className="animate-pulse" />
@@ -268,7 +268,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                {leaderboard.slice(0, 5).map((entry) => {
+                {leaderboard.topList.slice(0, 5).map((entry) => {
                   const medals = ["🥇", "🥈", "🥉"];
                   return (
                     <div

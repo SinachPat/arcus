@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Sidebar from "./Sidebar";
 import BottomNav from "./BottomNav";
+import { GamificationRenderer } from "@/components/gamification/GamificationRenderer";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -28,6 +29,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <div className="md:hidden">
         <BottomNav />
       </div>
+
+      {/* Gamification overlays — XP popups, level-up, badges, streak confetti */}
+      <GamificationRenderer />
     </div>
   );
 }

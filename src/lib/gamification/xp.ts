@@ -113,3 +113,10 @@ export function xpToNextLevel(totalXP: number): { current: number; needed: numbe
     level,
   };
 }
+
+/** Spec-aligned: XP progress to next level with percent. */
+export function getXPForNextLevel(currentXP: number): { current: number; next: number; percent: number } {
+  const { current, needed } = xpToNextLevel(currentXP);
+  const percent = needed > 0 ? Math.min(100, Math.round((current / needed) * 100)) : 100;
+  return { current, next: needed, percent };
+}

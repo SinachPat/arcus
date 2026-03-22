@@ -1,72 +1,64 @@
 import { create } from "zustand";
 import type { XPGain, StreakUpdate, BadgeEarned } from "@/types";
 
+export interface XPEvent {
+  id: string;
+  amount: number;
+  position?: { x: number; y: number };
+}
+
 interface GamificationState {
-  // Persisted values (mirrored from server)
   xp:            number;
   level:         number;
   currentStreak: number;
   streakShields: number;
-
-  // Optimistic in-flight gains (shown in UI before server confirms)
   pendingXP:     number;
 
-  // Toast queue for badges earned this session
-  badgeQueue:    BadgeEarned[];
+  xpEvents:      XPEvent[];
+  levelUpEvent:  { level: number; title: string } | null;
+  badgeEvents:   BadgeEarned[];
+  streakEvent:   { days: number } | null;
 
-  // Last streak update (for UI animation)
+  badgeQueue:    BadgeEarned[];
   lastStreakUpdate: StreakUpdate | null;
 
-  // ---- Actions ----
-
-  /** Sync base state from server (called after server mutation). */
-  syncFromServer: (data: {
-    xp: number;
-    level: number;
-    currentStreak: number;
-    streakShields: number;
-  }) => void;
-
-  /** Optimistically add XP before server confirms. */
+  syncFromServer: (data: { xp: number; level: number; currentStreak: number; streakShields: number }) => void;
   addOptimisticXP: (gain: XPGain) => void;
-
-  /** Clear pending XP (call after server confirms, using real value). */
   clearPendingXP: () => void;
 
-  /** Push a badge to the toast queue. */
+  addXPEvent: (amount: number, position?: { x: number; y: number }) => void;
+  clearXPEvent: (id: string) => void;
+  setLevelUpEvent: (event: { level: number; title: string } | null) => void;
+  addBadgeEvent: (badge: BadgeEarned) => void;
+  clearBadgeEvent: (badgeId: string) => void;
+  setStreakEvent: (event: { days: number } | null) => void;
+
   enqueueBadge: (badge: BadgeEarned) => void;
-
-  /** Dequeue the oldest badge (call after toast is shown). */
   dequeueBadge: () => void;
-
-  /** Record a streak update for UI animation. */
   applyStreakUpdate: (update: StreakUpdate) => void;
 }
 
 export const useGamificationStore = create<GamificationState>((set) => ({
-  xp:            0,
-  level:         1,
-  currentStreak: 0,
-  streakShields: 0,
-  pendingXP:     0,
-  badgeQueue:    [],
-  lastStreakUpdate: null,
+  xp: 0, level: 1, currentStreak: 0, streakShields: 0, pendingXP: 0,
+  xpEvents: [], levelUpEvent: null, badgeEvents: [], streakEvent: null,
+  badgeQueue: [], lastStreakUpdate: null,
 
   syncFromServer: ({ xp, level, currentStreak, streakShields }) =>
     set({ xp, level, currentStreak, streakShields, pendingXP: 0 }),
+  addOptimisticXP: (gain) => set((s) => ({ pendingXP: s.pendingXP + gain.total })),
+  clearPendingXP: () => set({ pendingXP: 0 }),
 
-  addOptimisticXP: (gain) =>
-    set((s) => ({ pendingXP: s.pendingXP + gain.total })),
+  addXPEvent: (amount, position) =>
+    set((s) => ({ xpEvents: [...s.xpEvents, { id: `xp-${Date.now()}-${Math.random()}`, amount, position }] })),
+  clearXPEvent: (id) =>
+    set((s) => ({ xpEvents: s.xpEvents.filter((e) => e.id !== id) })),
+  setLevelUpEvent: (event) => set({ levelUpEvent: event }),
+  addBadgeEvent: (badge) => set((s) => ({ badgeEvents: [...s.badgeEvents, badge] })),
+  clearBadgeEvent: (badgeId) =>
+    set((s) => ({ badgeEvents: s.badgeEvents.filter((b) => b.badgeId !== badgeId) })),
+  setStreakEvent: (event) => set({ streakEvent: event }),
 
-  clearPendingXP: () =>
-    set({ pendingXP: 0 }),
-
-  enqueueBadge: (badge) =>
-    set((s) => ({ badgeQueue: [...s.badgeQueue, badge] })),
-
-  dequeueBadge: () =>
-    set((s) => ({ badgeQueue: s.badgeQueue.slice(1) })),
-
-  applyStreakUpdate: (update) =>
-    set({ lastStreakUpdate: update, currentStreak: update.newStreak }),
+  enqueueBadge: (badge) => set((s) => ({ badgeQueue: [...s.badgeQueue, badge] })),
+  dequeueBadge: () => set((s) => ({ badgeQueue: s.badgeQueue.slice(1) })),
+  applyStreakUpdate: (update) => set({ lastStreakUpdate: update, currentStreak: update.newStreak }),
 }));
