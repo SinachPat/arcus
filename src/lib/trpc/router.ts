@@ -7,6 +7,7 @@ import { progressRouter } from "./routers/progress";
 import { leaderboardRouter } from "./routers/leaderboard";
 import { profileRouter } from "./routers/profile";
 import { subscriptionRouter } from "./routers/subscription";
+import { tutorRouter } from "./routers/tutor";
 
 export const appRouter = router({
   auth:         authRouter,
@@ -17,6 +18,7 @@ export const appRouter = router({
   leaderboard:  leaderboardRouter,
   profile:      profileRouter,
   subscription: subscriptionRouter,
+  tutor:        tutorRouter,
 });
 
 export type AppRouter = typeof appRouter;

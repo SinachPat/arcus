@@ -12,6 +12,7 @@ import {
 import { useSessionStore } from "@/store/session";
 import { useAuthStore } from "@/store/auth";
 import { AI_MESSAGE_LIMITS } from "@/lib/constants";
+import { trpc } from "@/lib/trpc/client";
 import type { TutorContext } from "@/types";
 import ReactMarkdown from "react-markdown";
 
@@ -370,6 +371,18 @@ function TutorContent() {
   const tier = profile?.subscription_tier ?? "free";
   const dailyLimit = AI_MESSAGE_LIMITS[tier as keyof typeof AI_MESSAGE_LIMITS] ?? AI_MESSAGE_LIMITS.free;
 
+  // ── Server sync ────────────────────────────────────────────────────────────
+  const { data: serverHistory } = trpc.tutor.listConversations.useQuery();
+  const saveMutation   = trpc.tutor.saveConversation.useMutation();
+  const deleteMutation = trpc.tutor.deleteConversation.useMutation();
+
+  // When server data arrives, it takes precedence over localStorage
+  useEffect(() => {
+    if (!serverHistory) return;
+    setHistory(serverHistory);
+    saveHistory(serverHistory);
+  }, [serverHistory]);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -439,19 +452,20 @@ function TutorContent() {
       const convId = activeConvId ?? `conv-${Date.now()}`;
       if (!activeConvId) setActiveConvId(convId);
 
+      const updatedConv: SavedConversation = {
+        id: convId,
+        title,
+        messages,
+        mode,
+        savedAt: new Date().toISOString(),
+      };
       setHistory((prev) => {
-        const without = prev.filter((c) => c.id !== convId);
-        const updated: SavedConversation = {
-          id: convId,
-          title,
-          messages,
-          mode,
-          savedAt: new Date().toISOString(),
-        };
-        const next = [updated, ...without];
+        const next = [updatedConv, ...prev.filter((c) => c.id !== convId)];
         saveHistory(next);
         return next;
       });
+      // Persist to server (non-blocking — localStorage is already updated)
+      saveMutation.mutate({ id: convId, title, messages, mode });
     }, 1000);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
@@ -522,7 +536,9 @@ function TutorContent() {
       setMessages([]);
       setActiveConvId(null);
     }
-  }, [activeConvId, setMessages]);
+    // Remove from server too
+    deleteMutation.mutate({ id });
+  }, [activeConvId, setMessages, deleteMutation]);
 
   const handleReset = useCallback(() => {
     setMessages([]);
