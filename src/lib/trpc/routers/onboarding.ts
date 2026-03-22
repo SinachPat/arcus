@@ -340,14 +340,33 @@ Create a week-by-week study plan that prioritizes weakest domains while maintain
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user.id;
 
-      // 1. Update profile
-      const { error: profileError } = await ctx.supabase
-        .from("user_profiles")
-        .update({
+      // 1. Ensure public.users row exists (may be missing if no trigger was set up)
+      //    This is idempotent — on conflict it leaves the existing row unchanged.
+      const { error: usersError } = await ctx.supabase.from("users").upsert(
+        {
+          id:            userId,
+          email:         ctx.user.email ?? "",
+          name:          ctx.user.user_metadata?.full_name
+                           ?? ctx.user.user_metadata?.name
+                           ?? (ctx.user.email?.split("@")[0] ?? "User"),
+          auth_provider: (ctx.user.app_metadata?.provider ?? "email") as "email" | "google" | "github",
+        },
+        { onConflict: "id", ignoreDuplicates: true }
+      );
+      if (usersError) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `users upsert: ${usersError.message}` });
+      }
+
+      // 2. Upsert user_profiles — creates the row if missing, updates if present.
+      //    Using upsert instead of update so a missing row never silently no-ops.
+      const { error: profileError } = await ctx.supabase.from("user_profiles").upsert(
+        {
+          user_id:              userId,
           onboarding_completed: true,
           daily_goal_minutes:   input.dailyGoalMinutes,
-        })
-        .eq("user_id", userId);
+        },
+        { onConflict: "user_id" }
+      );
 
       if (profileError) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: profileError.message });

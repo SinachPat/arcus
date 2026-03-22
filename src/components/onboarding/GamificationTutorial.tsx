@@ -154,6 +154,7 @@ export default function GamificationTutorial() {
   const [panelIdx, setPanelIdx] = useState(0);
   const [dailyGoal, setDailyGoal] = useState(15);
   const [completing, setCompleting] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
 
   const completeMutation = trpc.onboarding.completeOnboarding.useMutation();
 
@@ -162,6 +163,7 @@ export default function GamificationTutorial() {
   const handleStart = useCallback(async () => {
     if (completing) return;
     setCompleting(true);
+    setStartError(null);
 
     try {
       await completeMutation.mutateAsync({ dailyGoalMinutes: dailyGoal });
@@ -174,12 +176,14 @@ export default function GamificationTutorial() {
         colors: ["#00C97C", "#22D3EE", "#F59E0B", "#F1F1F5"],
       });
 
-      // Wait for confetti, then redirect
+      // Hard navigate after confetti — bypasses Next.js router cache so
+      // AppLayout always fetches a fresh profile from Supabase.
       setTimeout(() => {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       }, 1500);
     } catch (err) {
       console.error("Failed to complete onboarding:", err);
+      setStartError("Something went wrong. Please try again.");
       setCompleting(false);
     }
   }, [completing, completeMutation, dailyGoal, router]);
@@ -363,6 +367,20 @@ export default function GamificationTutorial() {
           })}
         </div>
       </div>
+
+      {/* Error message */}
+      {startError && (
+        <p
+          style={{
+            marginTop: 16,
+            fontSize: 13,
+            color: "#EF4444",
+            textAlign: "center",
+          }}
+        >
+          {startError}
+        </p>
+      )}
 
       {/* Start button */}
       <motion.div

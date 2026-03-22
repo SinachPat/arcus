@@ -63,9 +63,10 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Unauthenticated users visiting protected routes → send to login
+  // Use a fresh URL (not a clone) so query params from the original
+  // request are not carried over to the login redirect.
   if (!user && !isPublicRoute(pathname)) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    const url = new URL("/login", request.url);
     return NextResponse.redirect(url);
   }
 

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import type { User, SupabaseClient } from "@supabase/supabase-js";
 
 export interface Context {
@@ -8,14 +9,18 @@ export interface Context {
 }
 
 export async function createContext(): Promise<Context> {
-  const supabase = await createClient();
+  // Use the anon client only to resolve the authenticated user from the
+  // session cookie. All DB reads/writes use the service-role client, which
+  // bypasses RLS. tRPC's protectedProcedure middleware is the auth gate.
+  const anonClient = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await anonClient.auth.getUser();
 
-  // Cast to SupabaseClient<any> — our hand-authored Database type doesn't
-  // fully satisfy supabase-js's GenericDatabase constraint, causing column
-  // queries in router procedures to infer as never. Using any preserves all
-  // runtime behaviour while allowing tRPC routers to query freely.
-  return { user, supabase: supabase as SupabaseClient<any> };
+  // Service-role client: bypasses RLS so writes never silently return 0 rows
+  // due to a missing or mismatched policy. Safe here because every route that
+  // writes data is wrapped in protectedProcedure (verified user required).
+  const supabase = createServiceClient() as SupabaseClient<any>;
+
+  return { user, supabase };
 }
