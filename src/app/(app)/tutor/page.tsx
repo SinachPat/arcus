@@ -547,13 +547,13 @@ function TutorContent() {
     (msg.parts ?? []).filter((p) => p.type === "tool-invocation");
 
   return (
-    <div style={{ padding: "20px 0", display: "flex", flexDirection: "column", height: "calc(100vh - 72px)" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 32px)" }}>
 
       {/* Header */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        marginBottom: 14, flexShrink: 0, flexWrap: "wrap", gap: 8,
-        paddingBottom: 14, borderBottom: "1px solid #2A2A38",
+        marginBottom: 10, flexShrink: 0, flexWrap: "wrap", gap: 8,
+        paddingBottom: 10, borderBottom: "1px solid #2A2A38",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{
@@ -833,7 +833,7 @@ function TutorContent() {
 export default function TutorPage() {
   return (
     <Suspense fallback={
-      <div style={{ padding: "32px 0", display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ padding: "0", display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ height: 34, width: 160, background: "#13131A", borderRadius: 8 }} className="animate-pulse" />
         <div style={{ height: 460, background: "#13131A", borderRadius: 10, border: "1px solid #2A2A38" }} className="animate-pulse" />
       </div>

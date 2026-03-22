@@ -19,10 +19,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         style={{ transition: "margin-left 0.2s ease" }}
         className={collapsed ? "md:ml-[72px]" : "md:ml-60"}
       >
-        <div
-          style={{ maxWidth: 1100, margin: "0 auto" }}
-          className="px-4 py-5 md:px-6 md:py-8 pb-24 md:pb-8"
-        >
+        <div className="px-4 py-4 md:px-5 md:py-4 pb-24 md:pb-4">
           {children}
         </div>
       </main>

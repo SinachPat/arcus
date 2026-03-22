@@ -23,7 +23,7 @@ export default function DomainDetailPage({
 
   if (isLoading || !domain) {
     return (
-      <div style={{ padding: "24px 0" }}>
+      <div style={{ padding: "0" }}>
         <div style={{ height: 18, width: 100, background: "#13131A", borderRadius: 4, marginBottom: 20 }} className="animate-pulse" />
         <div style={{ height: 32, width: 300, background: "#13131A", borderRadius: 6, marginBottom: 12 }} className="animate-pulse" />
         <div style={{ height: 10, background: "#13131A", borderRadius: 100, marginBottom: 12 }} className="animate-pulse" />
@@ -42,7 +42,7 @@ export default function DomainDetailPage({
   );
 
   return (
-    <div style={{ padding: "24px 0" }}>
+    <div style={{ padding: "0" }}>
       {/* Back link */}
       <Link
         href="/study"

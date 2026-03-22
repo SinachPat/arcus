@@ -42,7 +42,7 @@ export default function StudyPage() {
   });
 
   return (
-    <div style={{ padding: "24px 0" }}>
+    <div style={{ padding: "0" }}>
       <h1 style={{ fontSize: 24, fontWeight: 600, color: "#F1F1F5", marginBottom: 24 }}>
         Study
       </h1>

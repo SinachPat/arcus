@@ -1,6 +1,6 @@
 export default function ProgressPage() {
   return (
-    <div style={{ paddingTop: 32 }}>
+    <div style={{ paddingTop: 0 }}>
       <h1 style={{ fontSize: 24, fontWeight: 600, color: "#F1F1F5", fontFamily: "var(--font-geist-sans)" }}>
         Progress
       </h1>

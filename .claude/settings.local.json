@@ -122,7 +122,28 @@
       "Bash(supabase login:*)",
       "Bash(curl -s -X POST \"https://dmxaallhflqzjmlfpqot.supabase.co/rest/v1/rpc/exec_sql\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRteGFhbGxoZmxxemptbGZwcW90Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDAzMjg5NiwiZXhwIjoyMDg5NjA4ODk2fQ.xR5YPhgsGrNaAPpK6Q23Wj_s43RevwgP3orgAe6sHPI\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRteGFhbGxoZmxxemptbGZwcW90Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDAzMjg5NiwiZXhwIjoyMDg5NjA4ODk2fQ.xR5YPhgsGrNaAPpK6Q23Wj_s43RevwgP3orgAe6sHPI\" -H \"Content-Type: application/json\")",
       "Bash(curl -s \"https://dmxaallhflqzjmlfpqot.supabase.co/rest/v1/exams?select=id,name,code&is_active=eq.true\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRteGFhbGxoZmxxemptbGZwcW90Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDAzMjg5NiwiZXhwIjoyMDg5NjA4ODk2fQ.xR5YPhgsGrNaAPpK6Q23Wj_s43RevwgP3orgAe6sHPI\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRteGFhbGxoZmxxemptbGZwcW90Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDAzMjg5NiwiZXhwIjoyMDg5NjA4ODk2fQ.xR5YPhgsGrNaAPpK6Q23Wj_s43RevwgP3orgAe6sHPI\")",
-      "Bash(/opt/homebrew/Cellar/libpq/18.3/bin/psql \"postgresql://postgres.dmxaallhflqzjmlfpqot:Vfdm237shd@%235050@aws-0-us-east-1.pooler.supabase.com:6543/postgres\" -c \"SELECT 1 as test\")"
+      "Bash(/opt/homebrew/Cellar/libpq/18.3/bin/psql \"postgresql://postgres.dmxaallhflqzjmlfpqot:Vfdm237shd@%235050@aws-0-us-east-1.pooler.supabase.com:6543/postgres\" -c \"SELECT 1 as test\")",
+      "Bash(node -e \"const {tool, streamText} = require\\(''ai''\\); console.log\\(typeof tool\\);\")",
+      "Bash(node -e \"const {createAnthropic} = require\\(''@ai-sdk/anthropic''\\); const a = createAnthropic\\(\\); const m = a\\(''claude-haiku-4-5-20251001''\\); console.log\\(m.specificationVersion\\);\")",
+      "Bash(ls /Users/USER/Desktop/arcus/.next/server/app/\\\\\\(app\\\\\\)/tutor/)",
+      "Bash(npm --prefix /Users/USER/Desktop/arcus run build)",
+      "Bash(find /Users/USER/Desktop/arcus -maxdepth 4 -name middleware*)",
+      "Bash(grep -r \"proxy\\\\|middleware\" /Users/USER/Desktop/arcus/node_modules/next/dist/docs/01-app/03-api-reference/ --include=*.md -l)",
+      "Bash(find /Users/USER/Desktop/arcus/node_modules/next/dist/docs -name *proxy* -o -name *middleware*)",
+      "Bash(grep -r \"proxy\\\\|PROXY_MIDDLEWARE\" /Users/USER/Desktop/arcus/node_modules/next/dist/shared/lib/ --include=*.js -l)",
+      "Bash(git -C /Users/USER/Desktop/arcus status --short)",
+      "Bash(git -C /Users/USER/Desktop/arcus log --oneline -3)",
+      "Bash(vercel env:*)",
+      "Bash(node -e \"const a = require\\(''''/Users/USER/Desktop/arcus/node_modules/@ai-sdk/anthropic''''\\); console.log\\(Object.keys\\(a\\)\\)\")",
+      "Bash(node -e \"const ai = require\\(''/Users/USER/Desktop/arcus/node_modules/ai''\\); console.log\\(typeof ai.tool, typeof ai.streamText, typeof ai.DefaultChatTransport\\)\")",
+      "Bash(node -e \"const ai = require\\(''/Users/USER/Desktop/arcus/node_modules/ai''\\); console.log\\(typeof ai.convertToCoreMessages, typeof ai.convertToModelMessages\\)\")",
+      "Bash(git -C /Users/USER/Desktop/arcus add \"src/app/api/chat/tutor/route.ts\" \"src/app/\\(app\\)/tutor/page.tsx\")",
+      "Bash(git -C:*)",
+      "Bash(git -C /Users/USER/Desktop/arcus push origin main)",
+      "Bash(head -60 /Users/USER/Desktop/arcus/src/app/\\\\\\(app\\\\\\)/dashboard/page.tsx)",
+      "Bash(head -40 /Users/USER/Desktop/arcus/src/app/\\\\\\(app\\\\\\)/study/page.tsx)",
+      "Bash(grep -rn 'padding: \"\"32px 0\"\"\\\\|padding: \"\"24px 0\"\"\\\\|padding: \"\"28px 0\"\"' /Users/USER/Desktop/arcus/src/app/\\\\\\(app\\\\\\)/ --include=\"*.tsx\")",
+      "Bash(grep -rn 'padding: \"\"32px 0\"\"\\\\|padding: \"\"24px 0\"\"\\\\|padding: \"\"28px 0\"\"' /Users/USER/Desktop/arcus/src/app/\\\\\\(app\\\\\\)/progress/ /Users/USER/Desktop/arcus/src/app/\\\\\\(app\\\\\\)/profile/ /Users/USER/Desktop/arcus/src/app/\\\\\\(app\\\\\\)/leaderboard/ /Users/USER/Desktop/arcus/src/app/\\\\\\(app\\\\\\)/settings/ --include=\"*.tsx\")"
     ]
   }
 }

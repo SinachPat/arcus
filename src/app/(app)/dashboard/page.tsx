@@ -48,7 +48,7 @@ export default function DashboardPage() {
 
   if (isLoading || !data) {
     return (
-      <div style={{ padding: "32px 0" }}>
+      <div style={{ padding: "0" }}>
         <div style={{ height: 32, width: 240, background: "#13131A", borderRadius: 6, marginBottom: 8 }} className="animate-pulse" />
         <div style={{ height: 18, width: 160, background: "#13131A", borderRadius: 4 }} className="animate-pulse" />
         <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
@@ -86,7 +86,7 @@ export default function DashboardPage() {
   const gaugeProgress = (readiness / 100) * gaugeCircumference;
 
   return (
-    <div style={{ padding: "24px 0" }}>
+    <div style={{ padding: "0" }}>
       <div
         style={{
           display: "grid",

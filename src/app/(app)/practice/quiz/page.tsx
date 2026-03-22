@@ -193,7 +193,7 @@ function QuizContent() {
   // Loading state
   if (loadingQuestions || questions.length === 0) {
     return (
-      <div style={{ padding: "24px 0", maxWidth: 680, margin: "0 auto" }}>
+      <div style={{ padding: "0", maxWidth: 680, margin: "0 auto" }}>
         <div style={{ height: 4, background: "#2A2A38", marginBottom: 24 }} />
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ height: 24, width: 200, background: "#13131A", borderRadius: 4 }} className="animate-pulse" />
