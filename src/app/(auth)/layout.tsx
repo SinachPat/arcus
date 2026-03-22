@@ -10,22 +10,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
       style={{ background: "#0A0A0F" }}
     >
-      {/* Wordmark */}
+      {/* Logo */}
       <div className="flex flex-col items-center mb-8">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="Arcus" style={{ height: 36, width: "auto" }} />
         <span
           style={{
-            fontFamily: "var(--font-geist-sans)",
-            fontSize: 18,
-            fontWeight: 600,
-            letterSpacing: "0.15em",
-            color: "#F1F1F5",
-          }}
-        >
-          ARCUS
-        </span>
-        <span
-          style={{
-            marginTop: 6,
+            marginTop: 10,
             fontSize: 13,
             color: "#8B8BA7",
             fontFamily: "var(--font-geist-sans)",

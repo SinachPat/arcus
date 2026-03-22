@@ -150,31 +150,14 @@ export default function Sidebar({
           paddingLeft: collapsed ? 0 : 0,
         }}
       >
-        {/* Logo — hidden when collapsed, only green dot visible */}
-        {!collapsed && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: "50%",
-                background: "#00C97C",
-                display: "inline-block",
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                fontSize: 15,
-                fontWeight: 700,
-                letterSpacing: "0.15em",
-                color: "#F1F1F5",
-                fontFamily: "var(--font-geist-sans)",
-              }}
-            >
-              ARCUS
-            </span>
-          </div>
+        {/* Logo */}
+        {collapsed ? (
+          /* Collapsed: show just the green icon mark cropped */
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src="/logo.png" alt="Arcus" style={{ height: 24, width: "auto", objectFit: "contain", objectPosition: "left" }} />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src="/logo.png" alt="Arcus" style={{ height: 28, width: "auto" }} />
         )}
 
         {/* Collapse toggle */}

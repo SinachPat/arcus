@@ -20,26 +20,9 @@ export default function LandingPage() {
       }}
     >
       {/* Logo */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
-        <span
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: "50%",
-            background: "#00C97C",
-            display: "inline-block",
-          }}
-        />
-        <span
-          style={{
-            fontSize: 20,
-            fontWeight: 700,
-            letterSpacing: "0.15em",
-            color: "#F1F1F5",
-          }}
-        >
-          ARCUS
-        </span>
+      <div style={{ marginBottom: 24 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="Arcus" style={{ height: 40, width: "auto" }} />
       </div>
 
       {/* Headline */}
