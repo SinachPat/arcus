@@ -51,7 +51,7 @@ interface SessionStats {
   streakDay: number;
 }
 
-function QuizContent() {
+function QuizContent({ onKeepStudying }: { onKeepStudying: () => void }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const setTutorContext = useSessionStore((s) => s.setTutorContext);
@@ -317,11 +317,9 @@ function QuizContent() {
           )}
 
           {/* Action buttons */}
-          <Link href="/practice/quiz">
-            <button style={summaryButtonPrimary}>
-              Keep Studying →
-            </button>
-          </Link>
+          <button style={summaryButtonPrimary} onClick={onKeepStudying}>
+            Keep Studying →
+          </button>
           <Link href="/dashboard">
             <button style={summaryButtonSecondary}>
               Back to Dashboard
@@ -764,7 +762,11 @@ const summaryButtonSecondary: React.CSSProperties = {
 };
 
 // Wrap in Suspense for useSearchParams
+// sessionKey is incremented by "Keep Studying" to force a full remount of QuizContent,
+// wiping all state (questions, answers, sessionId) and triggering a fresh tRPC fetch.
 export default function QuizPage() {
+  const [sessionKey, setSessionKey] = useState(0);
+
   return (
     <Suspense
       fallback={
@@ -774,7 +776,10 @@ export default function QuizPage() {
         </div>
       }
     >
-      <QuizContent />
+      <QuizContent
+        key={sessionKey}
+        onKeepStudying={() => setSessionKey((k) => k + 1)}
+      />
     </Suspense>
   );
 }
