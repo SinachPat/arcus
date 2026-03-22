@@ -6,7 +6,7 @@ import {
   LayoutDashboard,
   BookOpen,
   MessageSquare,
-  TrendingUp,
+  Swords,
   User,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
@@ -16,8 +16,8 @@ import { ROUTES } from "@/lib/constants";
 const navItems = [
   { href: ROUTES.dashboard, label: "Dashboard", icon: LayoutDashboard, showDot: false },
   { href: ROUTES.study,     label: "Study",      icon: BookOpen,        showDot: false },
+  { href: ROUTES.practice,  label: "Practice",   icon: Swords,          showDot: false },
   { href: ROUTES.tutor,     label: "AI Tutor",   icon: MessageSquare,   showDot: true  },
-  { href: ROUTES.progress,  label: "Progress",   icon: TrendingUp,      showDot: false },
   { href: ROUTES.profile,   label: "Profile",    icon: User,            showDot: false },
 ] as const;
 

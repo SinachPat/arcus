@@ -13,6 +13,7 @@ import {
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
+  Swords,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/store/auth";
@@ -21,6 +22,7 @@ import { ROUTES } from "@/lib/constants";
 const primaryNav = [
   { href: ROUTES.dashboard, label: "Dashboard", icon: LayoutDashboard },
   { href: ROUTES.study,     label: "Study",      icon: BookOpen },
+  { href: ROUTES.practice,  label: "Practice",   icon: Swords },
   { href: ROUTES.tutor,     label: "AI Tutor",   icon: MessageSquare },
   { href: ROUTES.progress,  label: "Progress",   icon: TrendingUp },
   { href: ROUTES.profile,   label: "Profile",    icon: User },
