@@ -11,6 +11,8 @@ import {
   Trophy,
   Settings,
   LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/store/auth";
@@ -29,21 +31,25 @@ function NavLink({
   label,
   icon: Icon,
   active,
+  collapsed,
 }: {
   href: string;
   label: string;
   icon: React.ElementType;
   active: boolean;
+  collapsed: boolean;
 }) {
   return (
     <Link
       href={href}
+      title={collapsed ? label : undefined}
       style={{
         height: 40,
-        padding: "0 12px",
+        padding: collapsed ? "0" : "0 12px",
         borderRadius: 6,
         display: "flex",
         alignItems: "center",
+        justifyContent: collapsed ? "center" : "flex-start",
         gap: 10,
         textDecoration: "none",
         background: active ? "#00C97C20" : "transparent",
@@ -60,16 +66,20 @@ function NavLink({
         size={18}
         style={{ color: active ? "#00C97C" : "#52526B", flexShrink: 0 }}
       />
-      <span
-        style={{
-          fontSize: 14,
-          fontFamily: "var(--font-geist-sans)",
-          color: active ? "#00C97C" : "#8B8BA7",
-          fontWeight: active ? 500 : 400,
-        }}
-      >
-        {label}
-      </span>
+      {!collapsed && (
+        <span
+          style={{
+            fontSize: 14,
+            fontFamily: "var(--font-geist-sans)",
+            color: active ? "#00C97C" : "#8B8BA7",
+            fontWeight: active ? 500 : 400,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+          }}
+        >
+          {label}
+        </span>
+      )}
     </Link>
   );
 }
@@ -80,7 +90,13 @@ function getInitials(name: string | undefined, email: string | undefined): strin
   return "?";
 }
 
-export default function Sidebar() {
+export default function Sidebar({
+  collapsed,
+  onToggle,
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+}) {
   const pathname = usePathname();
   const router   = useRouter();
   const { user, profile, reset } = useAuthStore();
@@ -109,46 +125,85 @@ export default function Sidebar() {
         left: 0,
         top: 0,
         height: "100vh",
-        width: 240,
+        width: collapsed ? 72 : 240,
         background: "#13131A",
         borderRight: "1px solid #2A2A38",
-        padding: "24px 16px",
+        padding: collapsed ? "24px 0" : "24px 16px",
         display: "flex",
         flexDirection: "column",
         zIndex: 50,
+        transition: "width 0.2s ease, padding 0.2s ease",
+        overflow: "hidden",
       }}
     >
-      {/* Logo */}
+      {/* Logo row + collapse toggle */}
       <div
         style={{
           paddingBottom: 28,
           borderBottom: "1px solid #2A2A38",
           display: "flex",
           alignItems: "center",
+          justifyContent: collapsed ? "center" : "space-between",
           gap: 8,
+          paddingLeft: collapsed ? 0 : 0,
         }}
       >
-        <span
+        {/* Logo — hidden when collapsed, only green dot visible */}
+        {!collapsed && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: "50%",
+                background: "#00C97C",
+                display: "inline-block",
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontSize: 15,
+                fontWeight: 700,
+                letterSpacing: "0.15em",
+                color: "#F1F1F5",
+                fontFamily: "var(--font-geist-sans)",
+              }}
+            >
+              ARCUS
+            </span>
+          </div>
+        )}
+
+        {/* Collapse toggle */}
+        <button
+          onClick={onToggle}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           style={{
-            width: 7,
-            height: 7,
-            borderRadius: "50%",
-            background: "#00C97C",
-            display: "inline-block",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 30,
+            height: 30,
+            borderRadius: 6,
             flexShrink: 0,
+            background: "transparent",
+            border: "1px solid #2A2A38",
+            cursor: "pointer",
+            color: "#52526B",
+            transition: "border-color 0.15s, color 0.15s",
           }}
-        />
-        <span
-          style={{
-            fontSize: 15,
-            fontWeight: 700,
-            letterSpacing: "0.15em",
-            color: "#F1F1F5",
-            fontFamily: "var(--font-geist-sans)",
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "#3D3D52";
+            e.currentTarget.style.color = "#F1F1F5";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "#2A2A38";
+            e.currentTarget.style.color = "#52526B";
           }}
         >
-          ARCUS
-        </span>
+          {collapsed ? <PanelLeftOpen size={14} /> : <PanelLeftClose size={14} />}
+        </button>
       </div>
 
       {/* Primary nav */}
@@ -160,6 +215,7 @@ export default function Sidebar() {
             label={item.label}
             icon={item.icon}
             active={isActive(item.href)}
+            collapsed={collapsed}
           />
         ))}
       </nav>
@@ -171,6 +227,7 @@ export default function Sidebar() {
           label="Leaderboard"
           icon={Trophy}
           active={isActive(ROUTES.leaderboard)}
+          collapsed={collapsed}
         />
       </div>
 
@@ -188,12 +245,14 @@ export default function Sidebar() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 10,
+            gap: collapsed ? 0 : 10,
             padding: "10px 4px",
+            justifyContent: collapsed ? "center" : "flex-start",
           }}
         >
           {/* Avatar */}
           <div
+            title={collapsed ? (displayName ?? "User") : undefined}
             style={{
               width: 28,
               height: 28,
@@ -208,45 +267,51 @@ export default function Sidebar() {
               color: "#F1F1F5",
               flexShrink: 0,
               fontFamily: "var(--font-geist-sans)",
+              cursor: "default",
             }}
           >
             {initials}
           </div>
 
-          {/* Name + tier */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: "#F1F1F5",
-                fontFamily: "var(--font-geist-sans)",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {displayName ?? "User"}
-            </p>
-          </div>
+          {!collapsed && (
+            <>
+              {/* Name */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: "#F1F1F5",
+                    fontFamily: "var(--font-geist-sans)",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    margin: 0,
+                  }}
+                >
+                  {displayName ?? "User"}
+                </p>
+              </div>
 
-          {/* Tier badge */}
-          <span
-            style={{
-              fontSize: 10,
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              fontWeight: 600,
-              padding: "2px 6px",
-              borderRadius: 999,
-              fontFamily: "var(--font-geist-sans)",
-              background: tier === "free" ? "#52526B30" : "#00C97C20",
-              color: tier === "free" ? "#8B8BA7" : "#00C97C",
-              flexShrink: 0,
-            }}
-          >
-            {tier.toUpperCase()}
-          </span>
+              {/* Tier badge */}
+              <span
+                style={{
+                  fontSize: 10,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  fontWeight: 600,
+                  padding: "2px 6px",
+                  borderRadius: 999,
+                  fontFamily: "var(--font-geist-sans)",
+                  background: tier === "free" ? "#52526B30" : "#00C97C20",
+                  color: tier === "free" ? "#8B8BA7" : "#00C97C",
+                  flexShrink: 0,
+                }}
+              >
+                {tier.toUpperCase()}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Settings link */}
@@ -255,13 +320,15 @@ export default function Sidebar() {
           label="Settings"
           icon={Settings}
           active={isActive(ROUTES.settings)}
+          collapsed={collapsed}
         />
 
         {/* Sign out */}
         <button
           onClick={handleSignOut}
+          title={collapsed ? "Sign out" : undefined}
           style={{
-            padding: "8px 12px 0",
+            padding: collapsed ? "8px 0" : "8px 12px 0",
             background: "none",
             border: "none",
             cursor: "pointer",
@@ -272,13 +339,15 @@ export default function Sidebar() {
             transition: "color 0.15s",
             display: "flex",
             alignItems: "center",
+            justifyContent: collapsed ? "center" : "flex-start",
             gap: 8,
+            width: "100%",
           }}
           onMouseOver={(e) => (e.currentTarget.style.color = "#EF4444")}
           onMouseOut={(e) => (e.currentTarget.style.color = "#52526B")}
         >
           <LogOut size={14} />
-          Sign out
+          {!collapsed && "Sign out"}
         </button>
       </div>
     </aside>
