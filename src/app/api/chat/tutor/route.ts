@@ -181,7 +181,16 @@ export async function POST(request: Request) {
       }),
     },
   };
-  const result = streamText(streamArgs);
-
-  return result.toUIMessageStreamResponse();
+  try {
+    const result = streamText(streamArgs);
+    return result.toUIMessageStreamResponse();
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const status = (err as { statusCode?: number }).statusCode ?? 500;
+    // Surface provider errors (invalid API key, no credits, etc.) as readable JSON
+    return new Response(JSON.stringify({ error: "provider_error", message: msg }), {
+      status,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 }

@@ -405,6 +405,8 @@ function TutorContent() {
         setRateLimitError(`Daily limit of ${dailyLimit} messages reached.`);
       } else if (msg.includes("circuit_breaker")) {
         setRateLimitError("High usage detected — try again in a few minutes.");
+      } else if (msg.toLowerCase().includes("credit") || msg.includes("billing")) {
+        setRateLimitError("AI service temporarily unavailable. Please try again later.");
       } else {
         setRateLimitError(null);
       }

@@ -8,8 +8,10 @@ export const openai = createOpenAI({
   ...(gatewayUrl ? { baseURL: `${gatewayUrl}/openai` } : {}),
 });
 
+// @ai-sdk/anthropic@3 defaults to https://api.anthropic.com (missing /v1),
+// which returns 404. Explicitly set the correct Messages API base URL.
 export const anthropic = createAnthropic({
-  ...(gatewayUrl ? { baseURL: `${gatewayUrl}/anthropic` } : {}),
+  baseURL: gatewayUrl ? `${gatewayUrl}/anthropic` : "https://api.anthropic.com/v1",
 });
 
 // Default model shortcuts
