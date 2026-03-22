@@ -8,6 +8,7 @@ import { Check, X, Lightbulb, Flag, ChevronRight, Flame, Sparkles } from "lucide
 import { trpc } from "@/lib/trpc/client";
 import { SAA_C03_EXAM_ID, SAA_C03_DOMAIN_IDS } from "@/lib/constants";
 import { getLevelTitle } from "@/lib/gamification/xp";
+import { useSessionStore } from "@/store/session";
 import Link from "next/link";
 
 const DOMAIN_LABELS: Record<string, string> = {
@@ -53,6 +54,7 @@ interface SessionStats {
 function QuizContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const setTutorContext = useSessionStore((s) => s.setTutorContext);
 
   const count = parseInt(searchParams.get("count") ?? "10");
   const domainId = searchParams.get("domainId") ?? undefined;
@@ -547,6 +549,15 @@ function QuizContent() {
                   )}
                   <Link
                     href={`/tutor?questionId=${question.id}`}
+                    onClick={() => setTutorContext({
+                      questionId: question.id,
+                      questionContent: question.content,
+                      userAnswer: selectedIds.map((sid) => question.options.find((o) => o.id === sid)?.text ?? sid),
+                      correctAnswer: feedback?.correctOptionIds.map((cid) => question.options.find((o) => o.id === cid)?.text ?? cid) ?? [],
+                      explanation: feedback?.explanation,
+                      domainName: DOMAIN_LABELS[question.domainId] ?? "AWS",
+                      masteryPercent: feedback?.updatedMastery,
+                    })}
                     style={{
                       height: 36,
                       border: "1px solid rgba(0,201,124,0.25)",

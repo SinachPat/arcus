@@ -1,8 +1,12 @@
 import { create } from "zustand";
-import type { ActiveSession, SessionQuestion, QuestionState } from "@/types";
+import type { ActiveSession, SessionQuestion, QuestionState, TutorContext } from "@/types";
 
 interface SessionStore {
   session: ActiveSession | null;
+
+  // AI Tutor context — set when navigating from a wrong answer
+  tutorContext: TutorContext | null;
+  setTutorContext: (ctx: TutorContext | null) => void;
 
   // Lifecycle
   startSession:  (session: ActiveSession)                         => void;
@@ -25,6 +29,8 @@ interface SessionStore {
 
 export const useSessionStore = create<SessionStore>((set, get) => ({
   session: null,
+  tutorContext: null,
+  setTutorContext: (ctx) => set({ tutorContext: ctx }),
 
   startSession: (session) => set({ session }),
 

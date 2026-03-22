@@ -76,6 +76,29 @@ function scoreTierLabel(score: number): { text: string; color: string } {
   return { text: "Looking good", color: "#4ADE80" };
 }
 
+/** Build a simple local fallback plan from the data we already have. */
+function buildFallbackPlan(domainScores: Record<string, number>, hoursPerWeek: number) {
+  const dailyMinutes = Math.max(15, Math.round((hoursPerWeek * 60) / 7));
+  const weakDomainIds = Object.entries(domainScores)
+    .sort(([, a], [, b]) => a - b)
+    .slice(0, 3)
+    .map(([id]) => DOMAIN_LABELS[id] ?? "Core AWS");
+  return {
+    estimatedDaysToReadiness: 56,
+    weeklyPlan: Array.from({ length: 8 }, (_, i) => ({
+      weekNumber: i + 1,
+      focusDomains: weakDomainIds,
+      dailyMinutes,
+      goals: [
+        `Complete ${Math.round(dailyMinutes / 3)} practice questions`,
+        "Review incorrect answers with AI tutor",
+        "Focus on high-weight exam domains",
+      ],
+    })),
+    priorityDomains: weakDomainIds,
+  };
+}
+
 export default function ResultsStudyPlan({
   examId,
   diagnosticResults,
@@ -93,6 +116,16 @@ export default function ResultsStudyPlan({
 
   const { readinessScore, domainScores } = diagnosticResults;
   const tier = scoreTierLabel(readinessScore);
+  const hoursPerWeek = parseHoursPerWeek(selfAssessment.studyHours);
+
+  // Build a local fallback plan immediately — this is what the button uses.
+  // The AI mutation may upgrade it later, but the user is never blocked.
+  const fallbackPlan = useRef(buildFallbackPlan(domainScores, hoursPerWeek));
+
+  // The displayed plan: AI plan when ready, fallback otherwise.
+  const plan = planMutation.data ?? fallbackPlan.current;
+  const isAiEnhanced = Boolean(planMutation.data);
+  const isGenerating = planMutation.isPending;
 
   // Animate score counter
   useEffect(() => {
@@ -120,23 +153,25 @@ export default function ResultsStudyPlan({
     };
   }, [readinessScore]);
 
-  // Trigger plan generation on mount
+  // Trigger AI plan generation on mount — upgrades the fallback if successful.
+  // onPlanGenerated is called whenever we have a plan to pass up to the wizard.
   useEffect(() => {
+    // Pass fallback plan up immediately so wizard state isn't empty
+    onPlanGenerated(fallbackPlan.current);
+
     planMutation.mutate(
       {
         examId,
         domainScores,
         targetTimeframe: parseTargetTimeframe(selfAssessment.targetDate),
-        hoursPerWeek: parseHoursPerWeek(selfAssessment.studyHours),
+        hoursPerWeek,
       },
       {
-        onSuccess: (plan) => onPlanGenerated(plan),
+        onSuccess: (aiPlan) => onPlanGenerated(aiPlan),
       }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const plan = planMutation.data;
 
   // SVG gauge
   const radius = 62;
@@ -315,32 +350,21 @@ export default function ResultsStudyPlan({
 
       {/* ── Study Plan ── */}
       <div style={{ marginTop: 28 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 600, color: "#F1F1F5", marginBottom: 4 }}>
-          Your study plan
-        </h2>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, color: "#F1F1F5", margin: 0 }}>
+            Your study plan
+          </h2>
+          {isGenerating && (
+            <span style={{ fontSize: 11, color: "#52526B", display: "flex", alignItems: "center", gap: 4 }}>
+              <span className="animate-pulse">✦</span> AI enhancing…
+            </span>
+          )}
+          {isAiEnhanced && (
+            <span style={{ fontSize: 11, color: "#00C97C" }}>✦ AI personalized</span>
+          )}
+        </div>
 
-        {!plan && (
-          <>
-            <p style={{ fontSize: 14, color: "#8B8BA7", marginBottom: 16 }}>
-              Generating your personalized plan...
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    height: 80,
-                    background: "#13131A",
-                    borderRadius: 8,
-                    border: "1px solid #2A2A38",
-                  }}
-                  className="animate-pulse"
-                />
-              ))}
-            </div>
-          </>
-        )}
-
+        {/* Plan is always available (fallback or AI) */}
         {plan && (
           <>
             <p style={{ fontSize: 14, color: "#8B8BA7", marginBottom: 16 }}>
@@ -414,32 +438,33 @@ export default function ResultsStudyPlan({
         )}
       </div>
 
-      {/* Continue button */}
+      {/* Continue button — always enabled, plan is always ready (fallback or AI) */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: plan ? 1 : 0.4, y: 0 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
         style={{ marginTop: 32, marginBottom: 32 }}
       >
         <button
           onClick={onNext}
-          disabled={!plan}
           style={{
             width: "100%",
             height: 52,
-            background: plan ? "#00C97C" : "#2A2A38",
+            background: "#00C97C",
             border: "none",
             borderRadius: 8,
             fontSize: 15,
             fontWeight: 500,
-            color: plan ? "#fff" : "#8B8BA7",
-            cursor: plan ? "pointer" : "default",
+            color: "#fff",
+            cursor: "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             gap: 8,
             fontFamily: "inherit",
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#00B06C")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "#00C97C")}
         >
           Let&apos;s set up your goals
           <ChevronRight size={18} />
