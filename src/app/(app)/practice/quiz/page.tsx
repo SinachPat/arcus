@@ -398,7 +398,8 @@ function QuizContent({ onKeepStudying }: { onKeepStudying: () => void }) {
               alignItems:   "center",
               gap:          10,
               boxShadow:    "0 4px 24px rgba(0,201,124,0.12)",
-              whiteSpace:   "nowrap",
+              width:        "calc(100vw - 48px)",
+              maxWidth:     360,
             }}
           >
             <Flame size={20} color="#F59E0B" />
