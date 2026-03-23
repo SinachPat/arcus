@@ -16,13 +16,13 @@ import { calculateStreakUpdate } from "@/lib/gamification/streaks";
 
 /** Monday of the current UTC week, as YYYY-MM-DD. */
 function getWeekStart(): string {
-  const now = new Date();
-  const day = now.getUTCDay();
-  const diff = (day + 6) % 7;
-  const monday = new Date(now);
-  monday.setUTCDate(now.getUTCDate() - diff);
-  monday.setUTCHours(0, 0, 0, 0);
-  return monday.toISOString().split("T")[0];
+  const now  = new Date();
+  const yyyy = now.getUTCFullYear();
+  const mm   = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const dd   = String(now.getUTCDate()).padStart(2, "0");
+  const hh   = String(now.getUTCHours()).padStart(2, "0");
+  const min  = String(now.getUTCMinutes()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
 }
 
 /** Fisher-Yates shuffle — unbiased, O(n). Mutates and returns the array. */

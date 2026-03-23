@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { trpc } from "@/lib/trpc/client";
 import { SAA_C03_EXAM_ID } from "@/lib/constants";
@@ -11,18 +11,9 @@ function getInitials(name: string): string {
 }
 
 function resetCountdown(): string {
-  const now = new Date();
-  const nextMonday = new Date(now);
-  const day = now.getUTCDay();
-  const daysUntilMonday = day === 1 ? 7 : (8 - day) % 7 || 7;
-  nextMonday.setUTCDate(now.getUTCDate() + daysUntilMonday);
-  nextMonday.setUTCHours(0, 0, 0, 0);
-  const ms = nextMonday.getTime() - now.getTime();
-  const totalHours = Math.floor(ms / 3600000);
-  const days = Math.floor(totalHours / 24);
-  const hours = totalHours % 24;
-  if (days > 0) return `${days}d ${hours}h`;
-  return `${hours}h`;
+  const now  = new Date();
+  const secs = 59 - now.getUTCSeconds();
+  return `${secs}s`;
 }
 
 function Avatar({ name, size = 32 }: { name: string; size?: number }) {
@@ -102,11 +93,18 @@ function LeaderboardRow({ entry, delay }: { entry: { userId: string; name: strin
 
 export default function LeaderboardPage() {
   const [examFilter, setExamFilter] = useState<"all" | "saa">("all");
+  const [countdown, setCountdown]   = useState(resetCountdown);
 
-  const { data, isLoading } = trpc.leaderboard.getWeekly.useQuery({
-    examId: examFilter === "saa" ? SAA_C03_EXAM_ID : undefined,
-    page: 1, pageSize: 50,
-  });
+  // Tick every second so the countdown stays current
+  useEffect(() => {
+    const id = setInterval(() => setCountdown(resetCountdown()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const { data, isLoading } = trpc.leaderboard.getWeekly.useQuery(
+    { examId: examFilter === "saa" ? SAA_C03_EXAM_ID : undefined, page: 1, pageSize: 50 },
+    { refetchInterval: 60_000 },  // re-fetch every minute when period resets
+  );
 
   const entries = data?.topList ?? [];
   const currentUserRow = data?.currentUserRow ?? null;
@@ -152,10 +150,10 @@ export default function LeaderboardPage() {
       {/* Week label + reset countdown */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
         <span style={{ fontSize: 12, color: "#52526B", fontFamily: "var(--font-geist-sans)" }}>
-          This week · Resets Monday
+          This minute · Resets every minute
         </span>
         <span style={{ fontSize: 12, fontFamily: "var(--font-geist-mono)", color: "#52526B" }}>
-          Resets in {resetCountdown()}
+          Resets in {countdown}
         </span>
       </div>
 

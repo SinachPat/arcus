@@ -3,14 +3,15 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "../init";
 import { LEADERBOARD } from "@/lib/constants";
 
+/** Returns a per-minute period key matching getWeekStart() in study.ts. */
 function currentWeekStart(): string {
   const now  = new Date();
-  const day  = now.getUTCDay(); // 0=Sun, 1=Mon
-  const diff = (day + 6) % 7;   // days since last Monday
-  const monday = new Date(now);
-  monday.setUTCDate(now.getUTCDate() - diff);
-  monday.setUTCHours(0, 0, 0, 0);
-  return monday.toISOString().split("T")[0]; // YYYY-MM-DD
+  const yyyy = now.getUTCFullYear();
+  const mm   = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const dd   = String(now.getUTCDate()).padStart(2, "0");
+  const hh   = String(now.getUTCHours()).padStart(2, "0");
+  const min  = String(now.getUTCMinutes()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
 }
 
 export const leaderboardRouter = router({
@@ -29,7 +30,7 @@ export const leaderboardRouter = router({
 
       let query = ctx.supabase
         .from("weekly_xp_snapshots")
-        .select("user_id, xp_earned, users(name, avatar_url), user_profiles(level)")
+        .select("user_id, xp_earned, users!left(name, avatar_url), user_profiles!left(level)")
         .eq("week_start", weekStart)
         .order("xp_earned", { ascending: false })
         .range(offset, offset + input.pageSize - 1);
@@ -59,7 +60,7 @@ export const leaderboardRouter = router({
       // Fetch current user's own row first (need their XP to count rank).
       const snapshotRes = await ctx.supabase
         .from("weekly_xp_snapshots")
-        .select("xp_earned, users(name, avatar_url), user_profiles(level)")
+        .select("xp_earned, users!left(name, avatar_url), user_profiles!left(level)")
         .eq("week_start", weekStart)
         .eq("user_id", ctx.user.id)
         .maybeSingle();
