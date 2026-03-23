@@ -284,14 +284,20 @@ export const mockRouter = router({
         .update({ xp: newTotalXP, level: newLevel })
         .eq("user_id", userId);
 
-      // 8. Update weekly_xp_snapshots
+      // 8. Update weekly_xp_snapshots — increment, not replace
       const weekStart = getWeekStart();
+      const { data: existingSnap } = await ctx.supabase
+        .from("weekly_xp_snapshots")
+        .select("xp_earned")
+        .eq("user_id", userId)
+        .eq("week_start", weekStart)
+        .maybeSingle();
       await ctx.supabase.from("weekly_xp_snapshots").upsert(
         {
-          user_id: userId,
+          user_id:    userId,
           week_start: weekStart,
-          xp_earned: xpAwarded,
-          exam_id: SAA_C03_EXAM_ID,
+          xp_earned:  ((existingSnap?.xp_earned as number) ?? 0) + xpAwarded,
+          exam_id:    SAA_C03_EXAM_ID,
         },
         { onConflict: "user_id,week_start" }
       );

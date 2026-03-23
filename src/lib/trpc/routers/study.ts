@@ -10,7 +10,7 @@ import {
 } from "@/lib/constants";
 import { computeAnswerXP, levelFromXP } from "@/lib/gamification/xp";
 import { evaluateBadges } from "@/lib/gamification/badges";
-import { calculateStreakUpdate } from "@/lib/gamification/streaks";
+import { calculateStreakUpdate, determineStreakAction } from "@/lib/gamification/streaks";
 
 export const studyRouter = router({
   // ── Dashboard data ─────────────────────────────────────────────────────
@@ -361,17 +361,25 @@ export const studyRouter = router({
         // non-critical — completeSession will finalize
       }
 
-      // 10. Update weekly XP snapshot
-      const weekStart = getWeekStart();
-      await ctx.supabase.from("weekly_xp_snapshots").upsert(
-        {
-          user_id: userId,
-          week_start: weekStart,
-          xp_earned: xpEarned,
-          exam_id: SAA_C03_EXAM_ID,
-        },
-        { onConflict: "user_id,week_start" }
-      );
+      // 10. Update weekly XP snapshot — increment, not replace
+      if (xpEarned > 0) {
+        const weekStart = getWeekStart();
+        const { data: existingSnap } = await ctx.supabase
+          .from("weekly_xp_snapshots")
+          .select("xp_earned")
+          .eq("user_id", userId)
+          .eq("week_start", weekStart)
+          .maybeSingle();
+        await ctx.supabase.from("weekly_xp_snapshots").upsert(
+          {
+            user_id: userId,
+            week_start: weekStart,
+            xp_earned: ((existingSnap?.xp_earned as number) ?? 0) + xpEarned,
+            exam_id: SAA_C03_EXAM_ID,
+          },
+          { onConflict: "user_id,week_start" }
+        );
+      }
 
       // 11. Evaluate badges
       let badgesEarned: Array<{ code: string; name: string; xpReward: number }> = [];
@@ -460,22 +468,45 @@ export const studyRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { data, error } = await ctx.supabase
-        .from("study_sessions")
-        .insert({
-          user_id: ctx.user.id,
-          exam_id: input.examId,
-          type: input.type,
-          questions_answered: 0,
-          correct_answers: 0,
-          xp_earned: 0,
-          config: input.config ?? null,
-        })
-        .select("id")
-        .single();
+      const [insertRes, profileRes] = await Promise.all([
+        ctx.supabase
+          .from("study_sessions")
+          .insert({
+            user_id:            ctx.user.id,
+            exam_id:            input.examId,
+            type:               input.type,
+            questions_answered: 0,
+            correct_answers:    0,
+            xp_earned:          0,
+            config:             input.config ?? null,
+          })
+          .select("id")
+          .single(),
+        ctx.supabase
+          .from("user_profiles")
+          .select("current_streak, last_study_date")
+          .eq("user_id", ctx.user.id)
+          .single(),
+      ]);
 
-      if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
-      return { sessionId: (data as Record<string, unknown>).id as string };
+      if (insertRes.error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: insertRes.error.message });
+
+      const p              = profileRes.data as Record<string, unknown> | null;
+      const currentStreak  = (p?.current_streak as number) ?? 0;
+      const lastStudyDate  = (p?.last_study_date as string | null) ?? null;
+
+      // Determine streak action so client can show a congratulatory banner
+      const lastDate = lastStudyDate ? new Date(lastStudyDate + "T00:00:00Z") : null;
+      const nowUTC   = new Date();
+      const streakAction = determineStreakAction(lastDate, nowUTC);
+
+      return {
+        sessionId:    (insertRes.data as Record<string, unknown>).id as string,
+        streakPreview: {
+          action:        streakAction,   // "new" | "increment" | "already_studied" | "broken"
+          currentStreak,
+        },
+      };
     }),
 
   // ── Complete a session ─────────────────────────────────────────────────
@@ -554,23 +585,55 @@ export const studyRouter = router({
       );
 
       // 6. Update profile
-      const newXP = currentXP + sessionXP;
+      const newXP    = currentXP + sessionXP;
       const newLevel = levelFromXP(newXP);
+
+      // Only write last_study_date when the session actually qualified for streak.
+      // If we write it unconditionally, a 2-question warm-up session on Day N
+      // marks lastStudyDate = today, so every subsequent session that same day
+      // sees "already studied" and the streak never increments.
+      const sessionQualified =
+        ((s.questions_answered as number) ?? 0) >= 5 &&
+        studyMinutes >= 5;
+
+      const profileUpdate: Record<string, unknown> = {
+        xp:             newXP,
+        level:          newLevel,
+        current_streak: streakUpdate.newStreak,
+        longest_streak: Math.max(
+          (p?.longest_streak as number) ?? 0,
+          streakUpdate.newStreak
+        ),
+        streak_shields: streakUpdate.shieldsRemaining,
+      };
+      if (sessionQualified) {
+        profileUpdate.last_study_date = new Date().toISOString().split("T")[0];
+      }
 
       await ctx.supabase
         .from("user_profiles")
-        .update({
-          xp: newXP,
-          level: newLevel,
-          current_streak: streakUpdate.newStreak,
-          longest_streak: Math.max(
-            (p?.longest_streak as number) ?? 0,
-            streakUpdate.newStreak
-          ),
-          streak_shields: streakUpdate.shieldsRemaining,
-          last_study_date: new Date().toISOString().split("T")[0],
-        })
+        .update(profileUpdate)
         .eq("user_id", userId);
+
+      // 6b. Increment weekly XP snapshot with session completion bonus
+      if (sessionXP > 0) {
+        const weekStart = getWeekStart();
+        const { data: existingSnap } = await ctx.supabase
+          .from("weekly_xp_snapshots")
+          .select("xp_earned")
+          .eq("user_id", userId)
+          .eq("week_start", weekStart)
+          .maybeSingle();
+        await ctx.supabase.from("weekly_xp_snapshots").upsert(
+          {
+            user_id:    userId,
+            week_start: weekStart,
+            xp_earned:  ((existingSnap?.xp_earned as number) ?? 0) + sessionXP,
+            exam_id:    SAA_C03_EXAM_ID,
+          },
+          { onConflict: "user_id,week_start" }
+        );
+      }
 
       return {
         questionsAnswered: (s.questions_answered as number) ?? 0,

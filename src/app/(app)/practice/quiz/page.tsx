@@ -85,6 +85,7 @@ function QuizContent({ onKeepStudying }: { onKeepStudying: () => void }) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [streakToast, setStreakToast] = useState<{ action: string; streak: number } | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<AnswerResult | null>(null);
   const [flaggedIds, setFlaggedIds] = useState<Set<string>>(new Set());
@@ -122,7 +123,16 @@ function QuizContent({ onKeepStudying }: { onKeepStudying: () => void }) {
       setQuestions(fetchedQuestions as QuestionData[]);
       startSession.mutate(
         { examId: SAA_C03_EXAM_ID, type: "practice" },
-        { onSuccess: (res) => setSessionId(res.sessionId) }
+        {
+          onSuccess: (res) => {
+            setSessionId(res.sessionId);
+            const { action, currentStreak } = res.streakPreview;
+            if (action === "new" || action === "increment") {
+              setStreakToast({ action, streak: action === "increment" ? currentStreak + 1 : 1 });
+              setTimeout(() => setStreakToast(null), 4000);
+            }
+          },
+        }
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -366,6 +376,48 @@ function QuizContent({ onKeepStudying }: { onKeepStudying: () => void }) {
 
   return (
     <div style={{ padding: "0" }}>
+      {/* ── Streak congratulations toast ── */}
+      <AnimatePresence>
+        {streakToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position:     "fixed",
+              top:          72,
+              left:         "50%",
+              transform:    "translateX(-50%)",
+              zIndex:       200,
+              background:   "#13131A",
+              border:       "1px solid #00C97C40",
+              borderRadius: 12,
+              padding:      "12px 20px",
+              display:      "flex",
+              alignItems:   "center",
+              gap:          10,
+              boxShadow:    "0 4px 24px rgba(0,201,124,0.12)",
+              whiteSpace:   "nowrap",
+            }}
+          >
+            <Flame size={20} color="#F59E0B" />
+            <div>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "#F1F1F5", fontFamily: "var(--font-geist-sans)" }}>
+                {streakToast.action === "new"
+                  ? "Streak started! 🎉"
+                  : `Day ${streakToast.streak} streak! Keep it up! 🔥`}
+              </p>
+              <p style={{ margin: 0, fontSize: 12, color: "#8B8BA7", fontFamily: "var(--font-geist-sans)" }}>
+                {streakToast.action === "new"
+                  ? "Study every day to build your streak."
+                  : "You're on a roll — study again tomorrow!"}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Progress bar */}
       <div style={{ width: "100%", height: 4, background: "#2A2A38" }}>
         <motion.div
