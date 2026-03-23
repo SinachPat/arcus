@@ -122,7 +122,7 @@ function Nav() {
             display: "none", background: "none", border: "none",
             cursor: "pointer", padding: 6, color: C.text,
             flexDirection: "column", gap: 5, alignItems: "center", justifyContent: "center",
-            justifySelf: "end",
+            gridColumn: 3, justifySelf: "end",
           }}
         >
           {/* Animated bars */}
