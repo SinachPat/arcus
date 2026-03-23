@@ -6,7 +6,7 @@ import { motion, useInView } from "framer-motion";
 import {
   Brain, Zap, Trophy, Target, CheckCircle, ArrowRight,
   Flame, Shield, BarChart3, MessageSquare, Swords,
-  ChevronRight, Users, Star, Clock, BookOpen, TrendingUp,
+  ChevronRight, Users, Clock, BookOpen, TrendingUp,
 } from "lucide-react";
 
 // ── Tokens ───────────────────────────────────────────────────────────────────
@@ -44,62 +44,146 @@ function FadeUp({ children, delay = 0, style }: { children: React.ReactNode; del
 }
 
 // ── Nav ───────────────────────────────────────────────────────────────────────
+const NAV_LINKS = [
+  ["#features", "Features"],
+  ["#how",      "How it works"],
+  ["#pricing",  "Pricing"],
+] as const;
+
 function Nav() {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled,    setScrolled]    = useState(false);
+  const [menuOpen,    setMenuOpen]    = useState(false);
+
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  return (
-    <nav style={{
-      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-      height: 60,
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "0 32px",
-      background: scrolled ? "rgba(10,10,15,0.85)" : "transparent",
-      backdropFilter: scrolled ? "blur(16px)" : "none",
-      borderBottom: scrolled ? `1px solid ${C.border}` : "1px solid transparent",
-      transition: "background 0.3s, border-color 0.3s, backdrop-filter 0.3s",
-    }}>
-      {/* Logo */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/logo.png" alt="Arcus" style={{ height: 26, width: "auto" }} />
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
 
-      {/* Links */}
-      <div style={{ display: "flex", alignItems: "center", gap: 32 }} className="nav-links">
-        {[["#features", "Features"], ["#how", "How it works"], ["#pricing", "Pricing"]].map(([href, label]) => (
-          <a key={href} href={href} style={{
-            fontSize: 14, color: C.muted, textDecoration: "none",
-            transition: "color 0.15s",
+  return (
+    <>
+      <nav style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+        height: 60,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 20px",
+        background: scrolled || menuOpen ? "rgba(10,10,15,0.95)" : "transparent",
+        backdropFilter: scrolled || menuOpen ? "blur(16px)" : "none",
+        borderBottom: scrolled || menuOpen ? `1px solid ${C.border}` : "1px solid transparent",
+        transition: "background 0.3s, border-color 0.3s",
+      }}>
+        {/* Logo */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="Arcus" style={{ height: 26, width: "auto" }} />
+
+        {/* Desktop links */}
+        <div style={{ display: "flex", alignItems: "center", gap: 32 }} className="nav-links">
+          {NAV_LINKS.map(([href, label]) => (
+            <a key={href} href={href} style={{
+              fontSize: 14, color: C.muted, textDecoration: "none", transition: "color 0.15s",
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = C.text)}
+            onMouseLeave={e => (e.currentTarget.style.color = C.muted)}
+            >{label}</a>
+          ))}
+        </div>
+
+        {/* Desktop CTAs */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }} className="nav-ctas">
+          <Link href="/login" style={{
+            fontSize: 14, color: C.muted, textDecoration: "none", padding: "0 4px", transition: "color 0.15s",
           }}
           onMouseEnter={e => (e.currentTarget.style.color = C.text)}
           onMouseLeave={e => (e.currentTarget.style.color = C.muted)}
-          >{label}</a>
-        ))}
-      </div>
+          >Sign in</Link>
+          <Link href="/signup" style={{
+            height: 36, padding: "0 18px", background: C.accent,
+            borderRadius: 8, fontSize: 14, fontWeight: 500, color: "#0A0A0F",
+            textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6,
+            transition: "background 0.15s",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = "#00b06c")}
+          onMouseLeave={e => (e.currentTarget.style.background = C.accent)}
+          >Get started <ArrowRight size={13} /></Link>
+        </div>
 
-      {/* CTAs */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <Link href="/login" style={{
-          fontSize: 14, color: C.muted, textDecoration: "none", padding: "0 4px",
-          transition: "color 0.15s",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.color = C.text)}
-        onMouseLeave={e => (e.currentTarget.style.color = C.muted)}
-        >Sign in</Link>
-        <Link href="/signup" style={{
-          height: 36, padding: "0 18px", background: C.accent,
-          borderRadius: 8, fontSize: 14, fontWeight: 500, color: "#0A0A0F",
-          textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6,
-          transition: "background 0.15s",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.background = "#00b06c")}
-        onMouseLeave={e => (e.currentTarget.style.background = C.accent)}
-        >Get started <ArrowRight size={13} /></Link>
-      </div>
-    </nav>
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMenuOpen(o => !o)}
+          className="nav-hamburger"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          style={{
+            display: "none", background: "none", border: "none",
+            cursor: "pointer", padding: 6, color: C.text,
+            flexDirection: "column", gap: 5, alignItems: "center", justifyContent: "center",
+          }}
+        >
+          {/* Animated bars */}
+          <span style={{
+            display: "block", width: 22, height: 2, background: C.text, borderRadius: 2,
+            transform: menuOpen ? "translateY(7px) rotate(45deg)" : "none",
+            transition: "transform 0.25s",
+          }} />
+          <span style={{
+            display: "block", width: 22, height: 2, background: C.text, borderRadius: 2,
+            opacity: menuOpen ? 0 : 1,
+            transition: "opacity 0.25s",
+          }} />
+          <span style={{
+            display: "block", width: 22, height: 2, background: C.text, borderRadius: 2,
+            transform: menuOpen ? "translateY(-7px) rotate(-45deg)" : "none",
+            transition: "transform 0.25s",
+          }} />
+        </button>
+      </nav>
+
+      {/* Mobile full-screen menu */}
+      {menuOpen && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 99,
+          background: "rgba(10,10,15,0.98)",
+          backdropFilter: "blur(16px)",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          gap: 0, paddingTop: 60,
+        }}>
+          {NAV_LINKS.map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                fontSize: 28, fontWeight: 600, color: C.text,
+                textDecoration: "none", padding: "18px 0",
+                borderBottom: `1px solid ${C.border2}`,
+                width: "100%", textAlign: "center",
+                transition: "color 0.15s",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = C.accent)}
+              onMouseLeave={e => (e.currentTarget.style.color = C.text)}
+            >{label}</a>
+          ))}
+          <div style={{ marginTop: 40, display: "flex", flexDirection: "column", gap: 12, width: "80%", maxWidth: 320 }}>
+            <Link href="/login" onClick={() => setMenuOpen(false)} style={{
+              height: 52, borderRadius: 10, border: `1px solid ${C.border}`,
+              fontSize: 16, fontWeight: 500, color: C.text,
+              textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center",
+            }}>Sign in</Link>
+            <Link href="/signup" onClick={() => setMenuOpen(false)} style={{
+              height: 52, borderRadius: 10, background: C.accent,
+              fontSize: 16, fontWeight: 600, color: "#0A0A0F",
+              textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            }}>Get started free <ArrowRight size={16} /></Link>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -130,24 +214,6 @@ function Hero() {
       }} />
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: 760 }}>
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          style={{ marginBottom: 28 }}
-        >
-          <span style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            padding: "6px 14px", borderRadius: 100,
-            border: `1px solid rgba(0,201,124,0.3)`,
-            background: "rgba(0,201,124,0.07)",
-            fontSize: 13, color: C.accent, fontWeight: 500,
-          }}>
-            <Star size={12} fill={C.accent} />
-            82% of Arcus users pass on their first attempt
-          </span>
-        </motion.div>
 
         {/* Headline */}
         <motion.h1
@@ -1049,7 +1115,9 @@ export default function LandingPage() {
         html { scroll-behavior: smooth; }
 
         @media (max-width: 900px) {
-          .nav-links { display: none !important; }
+          .nav-links  { display: none !important; }
+          .nav-ctas   { display: none !important; }
+          .nav-hamburger { display: flex !important; }
           .features-grid { grid-template-columns: 1fr !important; }
           .steps-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .step-connector { display: none !important; }
