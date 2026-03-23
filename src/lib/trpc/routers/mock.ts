@@ -255,7 +255,13 @@ export const mockRouter = router({
       }));
 
       if (historyRows.length > 0) {
-        await ctx.supabase.from("user_question_history").insert(historyRows);
+        const { error: histErr } = await ctx.supabase
+          .from("user_question_history")
+          .insert(historyRows);
+        if (histErr) {
+          // Non-fatal but log so we can diagnose future schema issues
+          console.error("[mock.submit] user_question_history insert failed:", histErr.message);
+        }
       }
 
       // 5. Bulk upsert user_domain_progress for all domains touched

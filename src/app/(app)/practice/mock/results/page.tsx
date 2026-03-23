@@ -305,11 +305,29 @@ function ResultsContent() {
         </div>
 
         {/* Question cards */}
-        {filteredQuestions.length === 0 && (
+        {allQuestions.length === 0 ? (
+          <div
+            style={{
+              background: "#13131A",
+              border: "1px solid #2A2A38",
+              borderRadius: 10,
+              padding: "32px 24px",
+              textAlign: "center",
+            }}
+          >
+            <p style={{ color: "#8B8BA7", fontSize: 15, marginBottom: 6 }}>
+              Answer history not available for this session.
+            </p>
+            <p style={{ color: "#52526B", fontSize: 13, margin: 0 }}>
+              This can happen if the session was submitted before a recent update.
+              Complete a new mock exam to see the full answer review here.
+            </p>
+          </div>
+        ) : filteredQuestions.length === 0 ? (
           <p style={{ color: "#52526B", fontSize: 14 }}>
             No questions match this filter.
           </p>
-        )}
+        ) : null}
 
         {filteredQuestions.map((q) => {
           const originalIndex = allQuestions.findIndex((aq) => aq.id === q.id);
