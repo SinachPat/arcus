@@ -3,15 +3,13 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "../init";
 import { LEADERBOARD } from "@/lib/constants";
 
-/** Returns a per-minute period key matching getWeekStart() in study.ts. */
+/** Today's UTC date as YYYY-MM-DD — matches getWeekStart() in study.ts / mock.ts. */
 function currentWeekStart(): string {
   const now  = new Date();
   const yyyy = now.getUTCFullYear();
   const mm   = String(now.getUTCMonth() + 1).padStart(2, "0");
   const dd   = String(now.getUTCDate()).padStart(2, "0");
-  const hh   = String(now.getUTCHours()).padStart(2, "0");
-  const min  = String(now.getUTCMinutes()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 export const leaderboardRouter = router({

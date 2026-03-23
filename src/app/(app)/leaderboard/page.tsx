@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { trpc } from "@/lib/trpc/client";
 import { SAA_C03_EXAM_ID } from "@/lib/constants";
@@ -10,11 +10,6 @@ function getInitials(name: string): string {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
-function resetCountdown(): string {
-  const now  = new Date();
-  const secs = 59 - now.getUTCSeconds();
-  return `${secs}s`;
-}
 
 function Avatar({ name, size = 32 }: { name: string; size?: number }) {
   return (
@@ -93,13 +88,6 @@ function LeaderboardRow({ entry, delay }: { entry: { userId: string; name: strin
 
 export default function LeaderboardPage() {
   const [examFilter, setExamFilter] = useState<"all" | "saa">("all");
-  const [countdown, setCountdown]   = useState(resetCountdown);
-
-  // Tick every second so the countdown stays current
-  useEffect(() => {
-    const id = setInterval(() => setCountdown(resetCountdown()), 1000);
-    return () => clearInterval(id);
-  }, []);
 
   const { data, isLoading } = trpc.leaderboard.getWeekly.useQuery(
     { examId: examFilter === "saa" ? SAA_C03_EXAM_ID : undefined, page: 1, pageSize: 50 },
@@ -147,13 +135,10 @@ export default function LeaderboardPage() {
         ))}
       </div>
 
-      {/* Week label + reset countdown */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+      {/* Period label */}
+      <div style={{ marginBottom: 20 }}>
         <span style={{ fontSize: 12, color: "#52526B", fontFamily: "var(--font-geist-sans)" }}>
-          This minute · Resets every minute
-        </span>
-        <span style={{ fontSize: 12, fontFamily: "var(--font-geist-mono)", color: "#52526B" }}>
-          Resets in {countdown}
+          Today · Resets at midnight UTC
         </span>
       </div>
 
@@ -169,7 +154,7 @@ export default function LeaderboardPage() {
         </div>
       ) : entries.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 0", color: "#52526B", fontSize: 14, fontFamily: "var(--font-geist-sans)" }}>
-          No study sessions this week yet. Be the first.
+          No study sessions today yet. Be the first.
         </div>
       ) : (
         <>

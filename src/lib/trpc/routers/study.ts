@@ -844,14 +844,12 @@ export const studyRouter = router({
 // ── Helpers ──────────────────────────────────────────────────────────────
 
 /** Returns a per-minute period key, e.g. "2026-03-23 14:05".
- *  This is the key used in weekly_xp_snapshots.week_start so the
- *  leaderboard resets every minute. */
+ *  This is the key used in weekly_xp_snapshots.week_start.
+ *  Daily granularity so the leaderboard resets at midnight UTC. */
 function getWeekStart(): string {
-  const now = new Date();
+  const now  = new Date();
   const yyyy = now.getUTCFullYear();
   const mm   = String(now.getUTCMonth() + 1).padStart(2, "0");
   const dd   = String(now.getUTCDate()).padStart(2, "0");
-  const hh   = String(now.getUTCHours()).padStart(2, "0");
-  const min  = String(now.getUTCMinutes()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  return `${yyyy}-${mm}-${dd}`;
 }
