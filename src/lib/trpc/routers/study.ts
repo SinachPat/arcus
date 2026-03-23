@@ -155,7 +155,20 @@ export const studyRouter = router({
           .map((h) => h.question_id)
       );
 
-      // 3. Build query
+      // 3. Build query — fetch from a random offset for variety each session
+      let countQuery = ctx.supabase
+        .from("questions")
+        .select("id", { count: "exact", head: true })
+        .eq("is_active", true)
+        .eq("is_shadow_mode", false);
+
+      if (input.domainId) countQuery = countQuery.eq("domain_id", input.domainId);
+      const { count: totalQ } = await countQuery;
+
+      const POOL = Math.min(60, totalQ ?? 60);
+      const maxOffset = Math.max(0, (totalQ ?? 0) - POOL);
+      const randOffset = maxOffset > 0 ? Math.floor(Math.random() * maxOffset) : 0;
+
       let query = ctx.supabase
         .from("questions")
         .select("id, domain_id, subtopic_id, type, content, options, difficulty, explanation, aws_doc_url, exam_objective_code")
@@ -166,8 +179,8 @@ export const studyRouter = router({
         query = query.eq("domain_id", input.domainId);
       }
 
-      // Fetch extra to filter post-query
-      const { data, error } = await query.limit(input.count * 3);
+      // Fetch extra to filter post-query, starting from random offset
+      const { data, error } = await query.range(randOffset, randOffset + POOL - 1);
       if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
 
       // 4. Score and sort questions by relevance

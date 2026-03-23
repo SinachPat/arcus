@@ -75,14 +75,25 @@ export const mockRouter = router({
         const needed = Math.round(config.questionCount * (weight / 100));
         if (needed === 0) continue;
 
+        // questions are scoped to exam via domain_id — no exam_id column on questions
+        const { count: totalCount } = await ctx.supabase
+          .from("questions")
+          .select("id", { count: "exact", head: true })
+          .eq("domain_id", domainId)
+          .eq("is_active", true)
+          .eq("is_shadow_mode", false);
+
+        const pool = needed * FETCH_MULTIPLIER;
+        const maxOffset = Math.max(0, (totalCount ?? 0) - pool);
+        const offset = maxOffset > 0 ? Math.floor(Math.random() * maxOffset) : 0;
+
         const { data: rows } = await ctx.supabase
           .from("questions")
           .select("id, domain_id, type, content, options, difficulty")
-          .eq("exam_id", input.examId)
           .eq("domain_id", domainId)
           .eq("is_active", true)
           .eq("is_shadow_mode", false)
-          .limit(needed * FETCH_MULTIPLIER);
+          .range(offset, offset + pool - 1);
 
         const shuffled = shuffle((rows ?? []) as Array<Record<string, unknown>>);
         domainBuckets.push(shuffled.slice(0, needed));
