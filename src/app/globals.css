@@ -111,6 +111,11 @@
   --shadow:            0 0 0 1px #2A2A38, 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
+/* Eliminate 300ms tap delay on all interactive elements — outside Tailwind layers so it isn't purged */
+button, a, [role="button"], input, select, textarea, label {
+  touch-action: manipulation;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -142,4 +147,5 @@
     outline: none;
     box-shadow: none;
   }
+
 }

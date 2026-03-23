@@ -71,7 +71,7 @@ function Nav() {
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
         height: 60,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
+        display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center",
         padding: "0 20px",
         background: scrolled || menuOpen ? "rgba(10,10,15,0.95)" : "transparent",
         backdropFilter: scrolled || menuOpen ? "blur(16px)" : "none",
@@ -95,7 +95,7 @@ function Nav() {
         </div>
 
         {/* Desktop CTAs */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }} className="nav-ctas">
+        <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "flex-end" }} className="nav-ctas">
           <Link href="/login" style={{
             fontSize: 14, color: C.muted, textDecoration: "none", padding: "0 4px", transition: "color 0.15s",
           }}
@@ -122,6 +122,7 @@ function Nav() {
             display: "none", background: "none", border: "none",
             cursor: "pointer", padding: 6, color: C.text,
             flexDirection: "column", gap: 5, alignItems: "center", justifyContent: "center",
+            justifySelf: "end",
           }}
         >
           {/* Animated bars */}
