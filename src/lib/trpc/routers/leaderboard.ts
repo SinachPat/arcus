@@ -26,9 +26,11 @@ export const leaderboardRouter = router({
       const weekStart = currentWeekStart();
       const offset    = (input.page - 1) * input.pageSize;
 
+      // user_profiles has no direct FK from weekly_xp_snapshots — must traverse
+      // the path via users: weekly_xp_snapshots → users → user_profiles
       let query = ctx.supabase
         .from("weekly_xp_snapshots")
-        .select("user_id, xp_earned, users!left(name, avatar_url), user_profiles!left(level)")
+        .select("user_id, xp_earned, users!left(name, avatar_url, user_profiles!left(level))")
         .eq("week_start", weekStart)
         .order("xp_earned", { ascending: false })
         .range(offset, offset + input.pageSize - 1);
@@ -40,16 +42,25 @@ export const leaderboardRouter = router({
       const { data, error } = await query;
       if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
 
+      type UserJoin = {
+        name: string;
+        avatar_url: string | null;
+        user_profiles: { level: number } | null;
+      };
+
       const rows = data ?? [];
-      const topList = rows.map((row, index) => ({
-        userId:        row.user_id,
-        name:          (row.users as unknown as { name: string } | null)?.name ?? "Anonymous",
-        avatarUrl:     (row.users as unknown as { avatar_url: string | null } | null)?.avatar_url ?? null,
-        level:         (row.user_profiles as unknown as { level: number } | null)?.level ?? 1,
-        xpEarned:      row.xp_earned,
-        rank:          offset + index + 1,
-        isCurrentUser: row.user_id === ctx.user.id,
-      }));
+      const topList = rows.map((row, index) => {
+        const u = row.users as unknown as UserJoin | null;
+        return {
+          userId:        row.user_id,
+          name:          u?.name ?? "Anonymous",
+          avatarUrl:     u?.avatar_url ?? null,
+          level:         u?.user_profiles?.level ?? 1,
+          xpEarned:      row.xp_earned,
+          rank:          offset + index + 1,
+          isCurrentUser: row.user_id === ctx.user.id,
+        };
+      });
 
       // If the current user is already visible in the top list, we're done.
       const alreadyInTop = topList.some((r) => r.isCurrentUser);
@@ -58,7 +69,7 @@ export const leaderboardRouter = router({
       // Fetch current user's own row first (need their XP to count rank).
       const snapshotRes = await ctx.supabase
         .from("weekly_xp_snapshots")
-        .select("xp_earned, users!left(name, avatar_url), user_profiles!left(level)")
+        .select("xp_earned, users!left(name, avatar_url, user_profiles!left(level))")
         .eq("week_start", weekStart)
         .eq("user_id", ctx.user.id)
         .maybeSingle();
@@ -66,6 +77,7 @@ export const leaderboardRouter = router({
       if (!snapshotRes.data) return { topList, currentUserRow: null };
 
       const userXP = snapshotRes.data.xp_earned;
+      const cu = snapshotRes.data.users as unknown as UserJoin | null;
 
       // Count how many users have strictly more XP — that's their rank minus 1.
       const { data: countData } = await ctx.supabase.rpc("count_users_above_xp", {
@@ -80,9 +92,9 @@ export const leaderboardRouter = router({
         topList,
         currentUserRow: {
           userId:        ctx.user.id,
-          name:          (snapshotRes.data.users as unknown as { name: string } | null)?.name ?? "Anonymous",
-          avatarUrl:     (snapshotRes.data.users as unknown as { avatar_url: string | null } | null)?.avatar_url ?? null,
-          level:         (snapshotRes.data.user_profiles as unknown as { level: number } | null)?.level ?? 1,
+          name:          cu?.name ?? "Anonymous",
+          avatarUrl:     cu?.avatar_url ?? null,
+          level:         cu?.user_profiles?.level ?? 1,
           xpEarned:      userXP,
           rank:          userRank,
           isCurrentUser: true,
