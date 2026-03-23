@@ -242,6 +242,8 @@ export const mockRouter = router({
       }));
 
       // 4. Insert user_question_history for ALL questions
+      // Note: `flagged` column is added by migration 009 — omit from insert until
+      // that migration has been run in Supabase SQL Editor.
       const historyRows = scoredAnswers.map((a) => ({
         user_id: userId,
         question_id: a.questionId,
@@ -250,7 +252,6 @@ export const mockRouter = router({
         selected_option_ids: a.selectedOptionIds,
         hint_used: false,
         time_spent_seconds: 0,
-        flagged: a.flagged,
       }));
 
       if (historyRows.length > 0) {
@@ -482,9 +483,10 @@ export const mockRouter = router({
       const sess = sessionRow as Record<string, unknown>;
 
       // 2. Fetch user_question_history for this session
+      // Note: `flagged` omitted until migration 009 runs in Supabase SQL Editor.
       const { data: historyRows, error: hErr } = await ctx.supabase
         .from("user_question_history")
-        .select("question_id, answered_correctly, selected_option_ids, flagged")
+        .select("question_id, answered_correctly, selected_option_ids")
         .eq("session_id", input.sessionId)
         .eq("user_id", userId);
 
@@ -547,7 +549,6 @@ export const mockRouter = router({
         question_id: string;
         answered_correctly: boolean;
         selected_option_ids: string[];
-        flagged: boolean;
       };
       type QuestionRow = {
         id: string;
@@ -592,7 +593,7 @@ export const mockRouter = router({
           difficulty: q.difficulty,
           userSelectedIds: h.selected_option_ids ?? [],
           isCorrect: h.answered_correctly,
-          flagged: h.flagged ?? false,
+          flagged: false, // persisted once migration 009 is applied
         };
       }).filter(Boolean);
 
