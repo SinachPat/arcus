@@ -7,6 +7,7 @@ import {
   SAA_C03_EXAM_ID,
   SAA_C03_DOMAIN_IDS,
   XP,
+  STREAK,
 } from "@/lib/constants";
 import { computeAnswerXP, levelFromXP } from "@/lib/gamification/xp";
 import { evaluateBadges } from "@/lib/gamification/badges";
@@ -491,6 +492,19 @@ export const studyRouter = router({
 
       if (insertRes.error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: insertRes.error.message });
 
+      // Seed a weekly_xp_snapshots row (0 XP) so the user appears on the
+      // leaderboard immediately — even before they answer any questions.
+      // ignoreDuplicates: true means we never overwrite an existing row.
+      await ctx.supabase.from("weekly_xp_snapshots").upsert(
+        {
+          user_id:    ctx.user.id,
+          week_start: getWeekStart(),
+          xp_earned:  0,
+          exam_id:    SAA_C03_EXAM_ID,
+        },
+        { onConflict: "user_id,week_start", ignoreDuplicates: true }
+      );
+
       const p              = profileRes.data as Record<string, unknown> | null;
       const currentStreak  = (p?.current_streak as number) ?? 0;
       const lastStudyDate  = (p?.last_study_date as string | null) ?? null;
@@ -593,8 +607,8 @@ export const studyRouter = router({
       // marks lastStudyDate = today, so every subsequent session that same day
       // sees "already studied" and the streak never increments.
       const sessionQualified =
-        ((s.questions_answered as number) ?? 0) >= 5 &&
-        studyMinutes >= 5;
+        ((s.questions_answered as number) ?? 0) >= STREAK.MIN_SESSION_QUESTIONS &&
+        studyMinutes >= STREAK.MIN_SESSION_MINUTES;
 
       const profileUpdate: Record<string, unknown> = {
         xp:             newXP,

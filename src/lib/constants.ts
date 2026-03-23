@@ -64,8 +64,8 @@ export function xpForLevel(level: number): number {
 export const STREAK = {
   SHIELD_EARN_INTERVAL_DAYS: 7,
   MAX_SHIELDS:               3,
-  MIN_SESSION_MINUTES:       5,
-  MIN_SESSION_QUESTIONS:     5,
+  MIN_SESSION_MINUTES:       1,
+  MIN_SESSION_QUESTIONS:     3,
   RECOVERY_WINDOW_HOURS:     24, // Pro: manual recovery within 24h of break
   MILESTONES:               [7, 30, 60, 100] as const,
 } as const;
