@@ -150,7 +150,8 @@ function MockSessionContent() {
 
   // ── Warning banners ──
   useEffect(() => {
-    if (!initialized) return;
+    // Don't fire until the timer has actually started (remainingSeconds > 0)
+    if (!initialized || remainingSeconds <= 0) return;
     const fifteenThreshold = MOCK_TIME_WARNING_MINUTES * 60;
     const fiveThreshold = MOCK_TIME_CRITICAL_MINUTES * 60;
 
@@ -524,15 +525,15 @@ function MockSessionContent() {
                 disabled={currentIndex === 0}
                 style={{
                   height: 40,
-                  border: "1px solid #2A2A38",
+                  border: currentIndex === 0 ? "1px solid #2A2A38" : "1px solid #00C97C",
                   borderRadius: 6,
                   background: "transparent",
                   padding: "0 16px",
                   fontSize: 13,
-                  color: currentIndex === 0 ? "#3D3D52" : "#8B8BA7",
+                  color: currentIndex === 0 ? "#3D3D52" : "#00C97C",
                   cursor: currentIndex === 0 ? "default" : "pointer",
                   fontFamily: "inherit",
-                  opacity: currentIndex === 0 ? 0.4 : 1,
+                  opacity: currentIndex === 0 ? 0.35 : 1,
                 }}
               >
                 ← Previous
@@ -543,12 +544,12 @@ function MockSessionContent() {
                   onClick={() => store.setCurrentIndex(currentIndex + 1)}
                   style={{
                     height: 40,
-                    border: "1px solid #2A2A38",
+                    border: "1px solid #00C97C",
                     borderRadius: 6,
                     background: "transparent",
                     padding: "0 16px",
                     fontSize: 13,
-                    color: "#8B8BA7",
+                    color: "#00C97C",
                     cursor: "pointer",
                     fontFamily: "inherit",
                   }}
