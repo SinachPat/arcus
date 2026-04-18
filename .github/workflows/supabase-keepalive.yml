@@ -1,0 +1,48 @@
+name: Keep Supabase Active
+
+# Supabase free tier pauses projects after 7 days of inactivity.
+# This workflow pings the database twice a week to prevent that.
+#
+# Required GitHub secrets (Settings → Secrets → Actions):
+#   NEXT_PUBLIC_SUPABASE_URL     — e.g. https://dmxaallhflqzjmlfpqot.supabase.co
+#   SUPABASE_SERVICE_ROLE_KEY    — service role key (not the anon key)
+
+on:
+  schedule:
+    # 9:00 AM UTC every Monday and Thursday
+    # Twice a week is well within the 7-day pause window
+    - cron: "0 9 * * 1,4"
+
+  # Adds a "Run workflow" button in the Actions UI — use this to test immediately
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping database
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Query Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          HTTP_STATUS=$(curl \
+            --silent \
+            --output /dev/null \
+            --write-out "%{http_code}" \
+            --request GET \
+            "$SUPABASE_URL/rest/v1/exams?select=id&limit=1" \
+            --header "apikey: $SUPABASE_KEY" \
+            --header "Authorization: Bearer $SUPABASE_KEY")
+
+          echo "HTTP status: $HTTP_STATUS"
+
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "❌ Ping failed — Supabase returned $HTTP_STATUS"
+            exit 1
+          fi
+
+          echo "✅ Supabase is active"
+
